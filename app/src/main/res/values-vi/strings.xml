@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">2PN</string>
+    <string name="employee_image">Hình ảnh nhân viên</string>
+    <string name="title_activity_settings">Cài đặt</string>
+
+    <string name="list">Danh sách</string>
+    <string name="search_hint">Tìm kiếm</string>
+
+    <string name="DetailsTitle">Thông tin</string>
+    <string name="DetailsUpdate">Cập nhật thông tin</string>
+
+    <string name="AddTitle">Thêm thông tin</string>
+    <string name="gallery_title">Thư viện</string>
+    <string name="camera_title">Máy ảnh</string>
+    <string name="name_title">Tên</string>
+    <string name="surname_title">Họ</string>
+    <string name="phone_number">Số điện thoại</string>
+    <string name="email_title">Email</string>
+    <string name="job_title">Chức vụ</string>
+    <string name="residence_title">Địa chỉ</string>
+
+    <string name="first_name_hint">Nhập họ</string>
+    <string name="last_name_hint">Nhập tên</string>
+    <string name="phone_hint">Nhập số điện thoại</string>
+    <string name="mail_hint">Nhập email</string>
+    <string name="job_hint">Nhập chức vụ</string>
+    <string name="residence_hint">Nhập địa chỉ</string>
+
+    <string name="params_header">Cài đặt</string>
+
+    <string name="language_title">Ngôn ngữ</string>
+
+    <string name="theme_title">Đổi giao diện</string>
+    <string name="theme_on">Chế độ sáng</string>
+    <string name="theme_off">Chế độ tối</string>
+</resources>
