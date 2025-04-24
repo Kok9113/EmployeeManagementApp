@@ -1,4 +1,4 @@
-package com.example.employeemanagementapp;
+package com.example.employeemanagementapp.db.model;
 
 public class Employee {
     private long id;

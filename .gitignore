@@ -13,3 +13,27 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Android Studio & IntelliJ
+
+*.iml
+
+# Build folders
+/build/
+**/build/
+
+# Log files
+*.log
+
+# Local properties
+local.properties
+
+# Gradle cache
+.gradle/
+
+# APK, dex, class files
+*.apk
+*.dex
+*.class
+
+

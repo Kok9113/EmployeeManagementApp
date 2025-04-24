@@ -1,9 +1,8 @@
-package com.example.employeemanagementapp;
+package com.example.employeemanagementapp.ui.employee;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -16,6 +15,11 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.db.dao.EmployeeDAO;
+import com.example.employeemanagementapp.db.model.Employee;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Locale;
 
@@ -24,7 +28,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
     private EditText editTextFirstName, editTextLastName, editTextPhoneNumber, editTextEmail, editTextResidence, editTextJob;
     private ImageView imageViewValidate, imageViewBack, imageView;
 
-    private DatabaseHelper databaseHelper;
+    private EmployeeDAO employeeDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +47,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
         imageView = findViewById(R.id.image_profile);
         imageView.setImageResource(R.drawable.ic_launcher_background);
 
-        databaseHelper = new DatabaseHelper(this);
+//        databaseHelper = new DatabaseHelper(this);
 
         imageViewBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,7 +137,9 @@ public class AddEmployeeActivity extends AppCompatActivity {
             return;
         }
 
-        long result = databaseHelper.insertEmployee(firstName, lastName, imageBytes, phoneNumber, email, residence, job);
+        Employee employee = new Employee(firstName, lastName, phoneNumber, email, residence, job);
+        employeeDAO = new EmployeeDAO(this);
+        long result = employeeDAO.insertEmployee(employee, imageBytes);
 
         if (result != -1) {
             Toast.makeText(this, "Employee added successfully", Toast.LENGTH_SHORT).show();
@@ -149,7 +155,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
         Log.d("selected language", selectedLanguage);
         Locale newLocale;
         if (selectedLanguage.equals("Tiếng Việt")) {
-            newLocale = new Locale("vi"); // Sửa từ "ar" thành "vi"
+            newLocale = new Locale("vi");
         } else {
             newLocale = Locale.ENGLISH;
         }

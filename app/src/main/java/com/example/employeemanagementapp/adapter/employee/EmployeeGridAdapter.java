@@ -1,4 +1,4 @@
-package com.example.employeemanagementapp;
+package com.example.employeemanagementapp.adapter.employee;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,6 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.utils.Constants;
 
 public class EmployeeGridAdapter extends BaseAdapter {
 
@@ -56,9 +60,9 @@ public class EmployeeGridAdapter extends BaseAdapter {
         }
 
         if (mCursor.moveToPosition(position)) {
-            @SuppressLint("Range") String firstName = mCursor.getString(mCursor.getColumnIndex(DatabaseHelper.COLUMN_FIRST_NAME));
-            @SuppressLint("Range") String lastName = mCursor.getString(mCursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_NAME));
-            @SuppressLint("Range") String job = mCursor.getString(mCursor.getColumnIndex(DatabaseHelper.COLUMN_JOB));
+            @SuppressLint("Range") String firstName = mCursor.getString(mCursor.getColumnIndex(Constants.COLUMN_FIRST_NAME));
+            @SuppressLint("Range") String lastName = mCursor.getString(mCursor.getColumnIndex(Constants.COLUMN_LAST_NAME));
+            @SuppressLint("Range") String job = mCursor.getString(mCursor.getColumnIndex(Constants.COLUMN_JOB));
 
             holder.nameTextView.setText(firstName);
             holder.lastNameTextView.setText(lastName);

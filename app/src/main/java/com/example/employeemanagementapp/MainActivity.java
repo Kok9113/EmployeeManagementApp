@@ -21,13 +21,20 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.db.dao.EmployeeDAO;
+import com.example.employeemanagementapp.ui.employee.AddEmployeeActivity;
+import com.example.employeemanagementapp.ui.employee.EmployeeDetails;
+import com.example.employeemanagementapp.adapter.employee.EmployeeGridAdapter;
+import com.example.employeemanagementapp.ui.setting.SettingsActivity;
+import com.example.employeemanagementapp.utils.Constants;
+
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int ADD_EMPLOYEE_REQUEST_CODE = 1;
-
-    private DatabaseHelper dbHelper;
+    private EmployeeDAO employeeDAO;
     private SimpleCursorAdapter listAdapter;
     private EmployeeGridAdapter gridAdapter;
     private EditText searchInput;
@@ -40,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         applyLanguage();
         this.setContentView(R.layout.activity_main);
 
-        dbHelper = new DatabaseHelper(this);
+        employeeDAO = new EmployeeDAO(this);
 
         listView = findViewById(R.id.listview);
         gridLayout = findViewById(R.id.gridlayout);
@@ -88,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                @SuppressLint("Range") long employeeId = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID));
+                @SuppressLint("Range") long employeeId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_ID));
                 showEmployeeDetails(employeeId);
             }
         });
@@ -116,14 +123,15 @@ public class MainActivity extends AppCompatActivity {
     }
     private void displayEmployees() {
         try {
-            Cursor cursor = dbHelper.getAllEmployees();
+            employeeDAO = new EmployeeDAO(this);
+            Cursor cursor = employeeDAO.getAllEmployees();
             if (cursor != null && cursor.moveToFirst()) {
                 if (listAdapter == null) {
                     listAdapter = new SimpleCursorAdapter(
                             this,
                             R.layout.list_item_layout,
                             cursor,
-                            new String[]{DatabaseHelper.COLUMN_FIRST_NAME, DatabaseHelper.COLUMN_LAST_NAME, DatabaseHelper.COLUMN_JOB},
+                            new String[]{Constants.COLUMN_FIRST_NAME, Constants.COLUMN_LAST_NAME, Constants.COLUMN_JOB},
                             new int[]{R.id.text_name, R.id.text_lastname, R.id.text_job},
                             0);
                     listView.setAdapter(listAdapter);
@@ -149,7 +157,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void filterEmployeeList(String query) {
-        Cursor cursor = dbHelper.getAllEmployeesFiltered(query);
+        employeeDAO = new EmployeeDAO(this);
+        Cursor cursor = employeeDAO.getAllEmployeesFiltered(query);
         if (cursor != null) {
             listAdapter.changeCursor(cursor);
             updateGridLayout(gridLayout, cursor); // Update the GridLayout as well
@@ -168,9 +177,9 @@ public class MainActivity extends AppCompatActivity {
                 TextView lastNameTextView = itemView.findViewById(R.id.text_lastname);
                 TextView jobTextView = itemView.findViewById(R.id.text_job);
 
-                nameTextView.setText(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_FIRST_NAME)));
-                lastNameTextView.setText(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_NAME)));
-                jobTextView.setText(cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_JOB)));
+                nameTextView.setText(cursor.getString(cursor.getColumnIndex(Constants.COLUMN_FIRST_NAME)));
+                lastNameTextView.setText(cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LAST_NAME)));
+                jobTextView.setText(cursor.getString(cursor.getColumnIndex(Constants.COLUMN_JOB)));
 
                 GridLayout.LayoutParams params = new GridLayout.LayoutParams();
                 params.width = GridLayout.LayoutParams.WRAP_CONTENT;
@@ -179,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                 params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f);
                 itemView.setLayoutParams(params);
 
-                final long employeeId = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID));
+                final long employeeId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_ID));
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

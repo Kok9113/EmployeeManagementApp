@@ -1,12 +1,14 @@
-package com.example.employeemanagementapp;
+package com.example.employeemanagementapp.adapter.employee;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.model.Employee;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.example.employeemanagementapp;
+package com.example.employeemanagementapp.ui.employee;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,7 +13,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,12 +20,19 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import com.example.employeemanagementapp.MainActivity;
+import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.db.dao.EmployeeDAO;
+import com.example.employeemanagementapp.db.model.Employee;
+import com.example.employeemanagementapp.utils.Constants;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Locale;
 
 public class EmployeeDetails extends AppCompatActivity {
 
-    private DatabaseHelper dbHelper;
+    private EmployeeDAO employeeDAO;
     private boolean isEditMode = false;
     private ImageView profileImageView;
 
@@ -36,19 +42,19 @@ public class EmployeeDetails extends AppCompatActivity {
         applyLanguage();
         setContentView(R.layout.activity_employee_details);
 
-        dbHelper = new DatabaseHelper(this);
+        employeeDAO = new EmployeeDAO(this);
 
         long employeeId = getIntent().getLongExtra("employeeId", -1);
 
         if (employeeId != -1) {
-            Cursor cursor = dbHelper.getEmployeeById(employeeId);
+            Cursor cursor = employeeDAO.getEmployeeById(employeeId);
             if (cursor != null && cursor.moveToFirst()) {
-                @SuppressLint("Range") String firstName = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_FIRST_NAME));
-                @SuppressLint("Range") String lastName = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_NAME));
-                @SuppressLint("Range") String phoneNumber = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_PHONE_NUMBER));
-                @SuppressLint("Range") String email = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_EMAIL));
-                @SuppressLint("Range") String job = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_JOB));
-                @SuppressLint("Range") String residence = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_RESIDENCE));
+                @SuppressLint("Range") String firstName = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_FIRST_NAME));
+                @SuppressLint("Range") String lastName = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LAST_NAME));
+                @SuppressLint("Range") String phoneNumber = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PHONE_NUMBER));
+                @SuppressLint("Range") String email = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_EMAIL));
+                @SuppressLint("Range") String job = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_JOB));
+                @SuppressLint("Range") String residence = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_RESIDENCE));
                 TextView firstNameTextView = findViewById(R.id.edittext_first_name);
                 TextView lastNameTextView = findViewById(R.id.edittext_last_name);
                 TextView phoneNumberTextView = findViewById(R.id.edittext_phone_number);
@@ -74,7 +80,7 @@ public class EmployeeDetails extends AppCompatActivity {
                 profileImageView.setImageResource(R.drawable.ic_launcher_background);
 
                 if (employeeId != -1) {
-                    byte[] imageData = dbHelper.getEmployeeProfileImage(employeeId);
+                    byte[] imageData = employeeDAO.getEmployeeProfileImage(employeeId);
                     if (imageData != null) {
                         Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
                         profileImageView.setImageBitmap(bitmap);
@@ -226,7 +232,7 @@ public class EmployeeDetails extends AppCompatActivity {
     public void deleteEmployee(View view) {
         long employeeId = getIntent().getLongExtra("employeeId", -1);
         if (employeeId != -1) {
-            int rowsDeleted = dbHelper.deleteEmployee(employeeId);
+            int rowsDeleted = employeeDAO.deleteEmployee(employeeId);
             if (rowsDeleted > 0) {
                 Toast.makeText(this, "Employee deleted successfully", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(this, MainActivity.class);
@@ -269,8 +275,8 @@ public class EmployeeDetails extends AppCompatActivity {
                 Toast.makeText(this, "Failed to process profile image", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            int rowsAffected = dbHelper.updateEmployee(employeeId, firstName, lastName, imageBytes, phoneNumber, email, job, residence);
+            Employee employee = new Employee(firstName, lastName, phoneNumber, email, residence, job);
+            int rowsAffected = employeeDAO.updateEmployee(employeeId, employee, imageBytes);
             if (rowsAffected > 0) {
                 Toast.makeText(this, "Employee updated successfully", Toast.LENGTH_SHORT).show();
             } else {
