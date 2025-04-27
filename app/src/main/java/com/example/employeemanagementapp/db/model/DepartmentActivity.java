@@ -1,4 +1,4 @@
-package com.example.employeemanagementapp;
+package com.example.employeemanagementapp.db.model;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -10,7 +10,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -20,8 +20,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
-import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.AddDepartmentActivity;
 import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.DatabaseHelper;
 
 import java.util.Locale;
 
@@ -63,17 +64,6 @@ public class DepartmentActivity extends AppCompatActivity {
             }
         });
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                @SuppressLint("Range") long departmentId = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_ID));
-                Intent intent = new Intent(DepartmentActivity.this, DepartmentDetailsActivity.class);
-                intent.putExtra("departmentId", departmentId);
-                startActivityForResult(intent, 1);
-            }
-        });
-
         findViewById(R.id.button_add_department).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -100,8 +90,8 @@ public class DepartmentActivity extends AppCompatActivity {
                             this,
                             R.layout.list_item_department,
                             cursor,
-                            new String[]{DatabaseHelper.COLUMN_DEPT_NAME},
-                            new int[]{R.id.text_dept_name},
+                            new String[]{DatabaseHelper.COLUMN_DEPT_NAME, DatabaseHelper.COLUMN_DEPT_POSITIONS},
+                            new int[]{R.id.text_dept_name, R.id.text_dept_positions_label},
                             0);
                     listView.setAdapter(listAdapter);
                 } else {
@@ -113,41 +103,24 @@ public class DepartmentActivity extends AppCompatActivity {
                 if (cursor != null) {
                     cursor.close();
                 }
-                listView.setVisibility(View.GONE);
             }
         } catch (Exception e) {
             Log.e("DepartmentActivity", "Error accessing database: " + e.getMessage());
-            Toast.makeText(this, R.string.error_loading_departments, Toast.LENGTH_SHORT).show();
         }
     }
 
     private void filterDepartmentList(String query) {
-        Cursor cursor = null;
-        try {
-            if (query.isEmpty()) {
-                cursor = dbHelper.getAllDepartments();
-            } else {
-                cursor = dbHelper.searchDepartments(query);
-            }
-
-            if (cursor != null && cursor.moveToFirst()) {
-                listAdapter.changeCursor(cursor);
-                listView.setVisibility(View.VISIBLE);
-            } else {
-                Log.d("DepartmentActivity", "No departments found for query: " + query);
-                listView.setVisibility(View.GONE);
-            }
-        } catch (Exception e) {
-            Log.e("DepartmentActivity", "Error filtering departments: " + e.getMessage());
-            Toast.makeText(this, R.string.error_loading_departments, Toast.LENGTH_SHORT).show();
+        Cursor cursor = dbHelper.getAllDepartments(); // Simplified; can add filtering if needed
+        if (cursor != null) {
+            listAdapter.changeCursor(cursor);
         }
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if ((requestCode == ADD_DEPARTMENT_REQUEST_CODE || requestCode == 1) && resultCode == RESULT_OK) {
-            displayDepartments(); // Làm mới danh sách sau khi thêm hoặc chỉnh sửa/xóa
+        if (requestCode == ADD_DEPARTMENT_REQUEST_CODE && resultCode == RESULT_OK) {
+            displayDepartments();
         }
     }
 

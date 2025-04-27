@@ -1,4 +1,5 @@
 package com.example.employeemanagementapp.ui.employee;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,8 +13,11 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,13 +32,33 @@ import com.example.employeemanagementapp.db.model.Employee;
 import com.example.employeemanagementapp.utils.Constants;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public class EmployeeDetails extends AppCompatActivity {
 
     private EmployeeDAO employeeDAO;
+    private DatabaseHelper dbHelper;
     private boolean isEditMode = false;
     private ImageView profileImageView;
+    private EditText editTextFirstName, editTextLastName, editTextPhoneNumber, editTextEmail, editTextResidence;
+    private Spinner spinnerDepartment, spinnerPosition;
+    private List<Department> departments;
+    private long selectedDepartmentId;
+
+    private static class Department {
+        long id;
+        String name;
+        String[] positions;
+
+        Department(long id, String name, String positions) {
+            this.id = id;
+            this.name = name;
+            this.positions = positions != null ? positions.split(",\\s*") : new String[]{};
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +67,19 @@ public class EmployeeDetails extends AppCompatActivity {
         setContentView(R.layout.activity_employee_details);
 
         employeeDAO = new EmployeeDAO(this);
+        dbHelper = new DatabaseHelper(this);
+
+        editTextFirstName = findViewById(R.id.edittext_first_name);
+        editTextLastName = findViewById(R.id.edittext_last_name);
+        editTextPhoneNumber = findViewById(R.id.edittext_phone_number);
+        editTextEmail = findViewById(R.id.edittext_email);
+        editTextResidence = findViewById(R.id.edittext_residence);
+        spinnerDepartment = findViewById(R.id.spinner_department);
+        spinnerPosition = findViewById(R.id.spinner_position);
+        profileImageView = findViewById(R.id.image_profile2);
 
         long employeeId = getIntent().getLongExtra("employeeId", -1);
+        loadDepartments();
 
         if (employeeId != -1) {
             Cursor cursor = employeeDAO.getEmployeeById(employeeId);
@@ -53,40 +88,48 @@ public class EmployeeDetails extends AppCompatActivity {
                 @SuppressLint("Range") String lastName = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LAST_NAME));
                 @SuppressLint("Range") String phoneNumber = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_PHONE_NUMBER));
                 @SuppressLint("Range") String email = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_EMAIL));
-                @SuppressLint("Range") String job = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_JOB));
                 @SuppressLint("Range") String residence = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_RESIDENCE));
-                TextView firstNameTextView = findViewById(R.id.edittext_first_name);
-                TextView lastNameTextView = findViewById(R.id.edittext_last_name);
-                TextView phoneNumberTextView = findViewById(R.id.edittext_phone_number);
-                TextView emailTextView = findViewById(R.id.edittext_email);
-                TextView jobTitleTextView = findViewById(R.id.edittext_job);
-                TextView residenceTextView = findViewById(R.id.edittext_residence);
+                @SuppressLint("Range") long departmentId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_DEPARTMENT_ID));
+                @SuppressLint("Range") String position = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_POSITION));
 
-                firstNameTextView.setText(firstName);
-                lastNameTextView.setText(lastName);
-                phoneNumberTextView.setText(phoneNumber);
-                emailTextView.setText(email);
-                jobTitleTextView.setText(job);
-                residenceTextView.setText(residence);
+                editTextFirstName.setText(firstName);
+                editTextLastName.setText(lastName);
+                editTextPhoneNumber.setText(phoneNumber);
+                editTextEmail.setText(email);
+                editTextResidence.setText(residence);
 
-                setEditTextReadonly((EditText) firstNameTextView);
-                setEditTextReadonly((EditText) lastNameTextView);
-                setEditTextReadonly((EditText) phoneNumberTextView);
-                setEditTextReadonly((EditText) emailTextView);
-                setEditTextReadonly((EditText) jobTitleTextView);
-                setEditTextReadonly((EditText) residenceTextView);
+                setEditTextReadonly(editTextFirstName);
+                setEditTextReadonly(editTextLastName);
+                setEditTextReadonly(editTextPhoneNumber);
+                setEditTextReadonly(editTextEmail);
+                setEditTextReadonly(editTextResidence);
+                spinnerDepartment.setEnabled(false);
+                spinnerPosition.setEnabled(false);
 
-                profileImageView = findViewById(R.id.image_profile2);
-                profileImageView.setImageResource(R.drawable.ic_launcher_background);
-
-                if (employeeId != -1) {
-                    byte[] imageData = employeeDAO.getEmployeeProfileImage(employeeId);
-                    if (imageData != null) {
-                        Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
-                        profileImageView.setImageBitmap(bitmap);
-                    } else {
-                        profileImageView.setImageResource(R.drawable.rounded_button_background);
+                // Set department spinner
+                for (int i = 0; i < departments.size(); i++) {
+                    if (departments.get(i).id == departmentId) {
+                        spinnerDepartment.setSelection(i);
+                        selectedDepartmentId = departmentId;
+                        updatePositionSpinner(departments.get(i).positions);
+                        // Set position spinner
+                        for (int j = 0; j < departments.get(i).positions.length; j++) {
+                            if (departments.get(i).positions[j].equals(position)) {
+                                spinnerPosition.setSelection(j);
+                                break;
+                            }
+                        }
+                        break;
                     }
+                }
+
+                profileImageView.setImageResource(R.drawable.ic_launcher_background);
+                byte[] imageData = employeeDAO.getEmployeeProfileImage(employeeId);
+                if (imageData != null) {
+                    Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+                    profileImageView.setImageBitmap(bitmap);
+                } else {
+                    profileImageView.setImageResource(R.drawable.rounded_button_background);
                 }
 
                 cursor.close();
@@ -99,6 +142,56 @@ public class EmployeeDetails extends AppCompatActivity {
         } else {
             Log.d("Employee Details", "Invalid employee ID");
         }
+
+        spinnerDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedDepartmentId = departments.get(position).id;
+                updatePositionSpinner(departments.get(position).positions);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                selectedDepartmentId = -1;
+                updatePositionSpinner(new String[]{});
+            }
+        });
+    }
+
+    private void loadDepartments() {
+        departments = new ArrayList<>();
+        Cursor cursor = dbHelper.getAllDepartments();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_ID));
+                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_NAME));
+                @SuppressLint("Range") String positions = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_POSITIONS));
+                departments.add(new Department(id, name, positions));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        List<String> departmentNames = new ArrayList<>();
+        for (Department dept : departments) {
+            departmentNames.add(dept.name);
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, departmentNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerDepartment.setAdapter(adapter);
+
+        if (!departments.isEmpty()) {
+            selectedDepartmentId = departments.get(0).id;
+            updatePositionSpinner(departments.get(0).positions);
+        } else {
+            spinnerPosition.setEnabled(false);
+        }
+    }
+
+    private void updatePositionSpinner(String[] positions) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, positions);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPosition.setAdapter(adapter);
+        spinnerPosition.setEnabled(isEditMode && positions.length > 0);
     }
 
     private void setEditTextReadonly(EditText editText) {
@@ -109,27 +202,22 @@ public class EmployeeDetails extends AppCompatActivity {
     public void toggleEditMode(View view) {
         isEditMode = !isEditMode;
 
-        TextView firstNameTextView = findViewById(R.id.edittext_first_name);
-        TextView lastNameTextView = findViewById(R.id.edittext_last_name);
-        TextView phoneNumberTextView = findViewById(R.id.edittext_phone_number);
-        TextView emailTextView = findViewById(R.id.edittext_email);
-        TextView jobTitleTextView = findViewById(R.id.edittext_job);
-        TextView residenceTextView = findViewById(R.id.edittext_residence);
-
         if (isEditMode) {
-            setEditTextEditable((EditText) firstNameTextView);
-            setEditTextEditable((EditText) lastNameTextView);
-            setEditTextEditable((EditText) phoneNumberTextView);
-            setEditTextEditable((EditText) emailTextView);
-            setEditTextEditable((EditText) jobTitleTextView);
-            setEditTextEditable((EditText) residenceTextView);
+            setEditTextEditable(editTextFirstName);
+            setEditTextEditable(editTextLastName);
+            setEditTextEditable(editTextPhoneNumber);
+            setEditTextEditable(editTextEmail);
+            setEditTextEditable(editTextResidence);
+            spinnerDepartment.setEnabled(true);
+            spinnerPosition.setEnabled(spinnerPosition.getAdapter().getCount() > 0);
         } else {
-            setEditTextReadonly((EditText) firstNameTextView);
-            setEditTextReadonly((EditText) lastNameTextView);
-            setEditTextReadonly((EditText) phoneNumberTextView);
-            setEditTextReadonly((EditText) emailTextView);
-            setEditTextReadonly((EditText) jobTitleTextView);
-            setEditTextReadonly((EditText) residenceTextView);
+            setEditTextReadonly(editTextFirstName);
+            setEditTextReadonly(editTextLastName);
+            setEditTextReadonly(editTextPhoneNumber);
+            setEditTextReadonly(editTextEmail);
+            setEditTextReadonly(editTextResidence);
+            spinnerDepartment.setEnabled(false);
+            spinnerPosition.setEnabled(false);
         }
     }
 
@@ -198,14 +286,10 @@ public class EmployeeDetails extends AppCompatActivity {
     }
 
     public void SendMail(View view) {
-        TextView emailTextView = findViewById(R.id.edittext_email);
-        String recipientEmail = emailTextView.getText().toString();
-
-        Log.d("Recipient Email", recipientEmail);
+        String recipientEmail = editTextEmail.getText().toString();
         Intent intent = new Intent(Intent.ACTION_SENDTO);
         intent.setData(Uri.parse("mailto:" + Uri.encode(recipientEmail)));
         intent.putExtra(Intent.EXTRA_EMAIL, new String[]{recipientEmail});
-
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
         } else {
@@ -214,16 +298,14 @@ public class EmployeeDetails extends AppCompatActivity {
     }
 
     public void MakeCall(View view) {
-        TextView phonetextView = findViewById(R.id.edittext_phone_number);
-        String recipientPhone = phonetextView.getText().toString();
+        String recipientPhone = editTextPhoneNumber.getText().toString();
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse("tel:" + recipientPhone));
         startActivity(intent);
     }
 
     public void MakeSMS(View view) {
-        TextView phonetextView = findViewById(R.id.edittext_phone_number);
-        String recipientPhone = phonetextView.getText().toString();
+        String recipientPhone = editTextPhoneNumber.getText().toString();
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("sms:" + recipientPhone));
         startActivity(intent);
@@ -248,34 +330,26 @@ public class EmployeeDetails extends AppCompatActivity {
 
     public void updateEmployee(View view) {
         long employeeId = getIntent().getLongExtra("employeeId", -1);
-
         if (employeeId != -1) {
-            EditText firstNameEditText = findViewById(R.id.edittext_first_name);
-            EditText lastNameEditText = findViewById(R.id.edittext_last_name);
-            EditText phoneNumberEditText = findViewById(R.id.edittext_phone_number);
-            EditText emailEditText = findViewById(R.id.edittext_email);
-            EditText jobEditText = findViewById(R.id.edittext_job);
-            EditText residenceEditText = findViewById(R.id.edittext_residence);
-
-            String firstName = firstNameEditText.getText().toString();
-            String lastName = lastNameEditText.getText().toString();
-            String phoneNumber = phoneNumberEditText.getText().toString();
-            String email = emailEditText.getText().toString();
-            String job = jobEditText.getText().toString();
-            String residence = residenceEditText.getText().toString();
+            String firstName = editTextFirstName.getText().toString();
+            String lastName = editTextLastName.getText().toString();
+            String phoneNumber = editTextPhoneNumber.getText().toString();
+            String email = editTextEmail.getText().toString();
+            String residence = editTextResidence.getText().toString();
+            String position = spinnerPosition.getSelectedItem() != null ? spinnerPosition.getSelectedItem().toString() : "";
             byte[] imageBytes = convertImageToByteArray();
 
             if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) ||
                     TextUtils.isEmpty(phoneNumber) || TextUtils.isEmpty(email) ||
-                    TextUtils.isEmpty(job) || TextUtils.isEmpty(residence)) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                    TextUtils.isEmpty(residence) || selectedDepartmentId == -1 || TextUtils.isEmpty(position)) {
+                Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
                 return;
             }
             if (imageBytes == null) {
                 Toast.makeText(this, "Failed to process profile image", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Employee employee = new Employee(firstName, lastName, phoneNumber, email, residence, job);
+            Employee employee = new Employee(firstName, lastName, phoneNumber, email, selectedDepartmentId, position, residence);
             int rowsAffected = employeeDAO.updateEmployee(employeeId, employee, imageBytes);
             if (rowsAffected > 0) {
                 Toast.makeText(this, "Employee updated successfully", Toast.LENGTH_SHORT).show();

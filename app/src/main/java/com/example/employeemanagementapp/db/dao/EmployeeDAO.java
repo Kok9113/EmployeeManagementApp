@@ -25,7 +25,8 @@ public class EmployeeDAO {
         values.put(Constants.COLUMN_PHONE_NUMBER, emp.getPhoneNumber());
         values.put(Constants.COLUMN_EMAIL, emp.getEmail());
         values.put(Constants.COLUMN_RESIDENCE, emp.getResidence());
-        values.put(Constants.COLUMN_JOB, emp.getJobTitle());
+        values.put(Constants.COLUMN_DEPARTMENT_ID, emp.getDepartmentId());
+        values.put(Constants.COLUMN_POSITION, emp.getPosition());
         return db.insert(Constants.TABLE_EMPLOYEE, null, values);
     }
 
@@ -41,7 +42,8 @@ public class EmployeeDAO {
         values.put(Constants.COLUMN_PHONE_NUMBER, emp.getPhoneNumber());
         values.put(Constants.COLUMN_EMAIL, emp.getEmail());
         values.put(Constants.COLUMN_RESIDENCE, emp.getResidence());
-        values.put(Constants.COLUMN_JOB, emp.getJobTitle());
+        values.put(Constants.COLUMN_DEPARTMENT_ID, emp.getDepartmentId());
+        values.put(Constants.COLUMN_POSITION, emp.getPosition());
         return db.update(Constants.TABLE_EMPLOYEE, values, Constants.COLUMN_ID + "=?", new String[]{String.valueOf(id)});
     }
 

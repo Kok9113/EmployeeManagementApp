@@ -6,18 +6,20 @@ public class Employee {
     private String lastName;
     private String phoneNumber;
     private String email;
-    private String jobTitle;
+    private long departmentId; // Thay jobTitle bằng departmentId
+    private String position; // Thêm position
     private String residence;
 
     public Employee() {
     }
 
-    public Employee(String firstName, String lastName, String phoneNumber, String email, String jobTitle, String residence) {
+    public Employee(String firstName, String lastName, String phoneNumber, String email, long departmentId, String position, String residence) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.email = email;
-        this.jobTitle = jobTitle;
+        this.departmentId = departmentId;
+        this.position = position;
         this.residence = residence;
     }
 
@@ -61,12 +63,20 @@ public class Employee {
         this.email = email;
     }
 
-    public String getJobTitle() {
-        return jobTitle;
+    public long getDepartmentId() {
+        return departmentId;
     }
 
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
+    public void setDepartmentId(long departmentId) {
+        this.departmentId = departmentId;
+    }
+
+    public String getPosition() {
+        return position;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     public String getResidence() {

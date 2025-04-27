@@ -1,16 +1,21 @@
 package com.example.employeemanagementapp.ui.employee;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
@@ -21,14 +26,32 @@ import com.example.employeemanagementapp.db.dao.EmployeeDAO;
 import com.example.employeemanagementapp.db.model.Employee;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 public class AddEmployeeActivity extends AppCompatActivity {
 
-    private EditText editTextFirstName, editTextLastName, editTextPhoneNumber, editTextEmail, editTextResidence, editTextJob;
+    private EditText editTextFirstName, editTextLastName, editTextPhoneNumber, editTextEmail, editTextResidence;
+    private Spinner spinnerDepartment, spinnerPosition;
     private ImageView imageViewValidate, imageViewBack, imageView;
-
     private EmployeeDAO employeeDAO;
+    private DatabaseHelper dbHelper;
+    private List<Department> departments;
+    private long selectedDepartmentId;
+
+    private static class Department {
+        long id;
+        String name;
+        String[] positions;
+
+        Department(long id, String name, String positions) {
+            this.id = id;
+            this.name = name;
+            this.positions = positions != null ? positions.split(",\\s*") : new String[]{};
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +64,17 @@ public class AddEmployeeActivity extends AppCompatActivity {
         editTextPhoneNumber = findViewById(R.id.edittext_phone_number);
         editTextEmail = findViewById(R.id.edittext_email);
         editTextResidence = findViewById(R.id.edittext_residence);
-        editTextJob = findViewById(R.id.edittext_job);
+        spinnerDepartment = findViewById(R.id.spinner_department);
+        spinnerPosition = findViewById(R.id.spinner_position);
         imageViewValidate = findViewById(R.id.image_validate);
         imageViewBack = findViewById(R.id.image_back);
         imageView = findViewById(R.id.image_profile);
         imageView.setImageResource(R.drawable.ic_launcher_background);
 
-//        databaseHelper = new DatabaseHelper(this);
+        dbHelper = new DatabaseHelper(this);
+        employeeDAO = new EmployeeDAO(this);
+
+        loadDepartments();
 
         imageViewBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +89,56 @@ public class AddEmployeeActivity extends AppCompatActivity {
                 addEmployee();
             }
         });
+
+        spinnerDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedDepartmentId = departments.get(position).id;
+                updatePositionSpinner(departments.get(position).positions);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                selectedDepartmentId = -1;
+                updatePositionSpinner(new String[]{});
+            }
+        });
+    }
+
+    private void loadDepartments() {
+        departments = new ArrayList<>();
+        Cursor cursor = dbHelper.getAllDepartments();
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_ID));
+                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_NAME));
+                @SuppressLint("Range") String positions = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_POSITIONS));
+                departments.add(new Department(id, name, positions));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        List<String> departmentNames = new ArrayList<>();
+        for (Department dept : departments) {
+            departmentNames.add(dept.name);
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, departmentNames);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerDepartment.setAdapter(adapter);
+
+        if (!departments.isEmpty()) {
+            selectedDepartmentId = departments.get(0).id;
+            updatePositionSpinner(departments.get(0).positions);
+        } else {
+            spinnerPosition.setEnabled(false);
+        }
+    }
+
+    private void updatePositionSpinner(String[] positions) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, positions);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPosition.setAdapter(adapter);
+        spinnerPosition.setEnabled(positions.length > 0);
     }
 
     public byte[] convertImageToByteArray() {
@@ -125,11 +202,11 @@ public class AddEmployeeActivity extends AppCompatActivity {
         String phoneNumber = editTextPhoneNumber.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
         String residence = editTextResidence.getText().toString().trim();
-        String job = editTextJob.getText().toString().trim();
+        String position = spinnerPosition.getSelectedItem() != null ? spinnerPosition.getSelectedItem().toString() : "";
         byte[] imageBytes = convertImageToByteArray();
 
-        if (firstName.isEmpty() || lastName.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || residence.isEmpty() || job.isEmpty()) {
-            Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
+        if (firstName.isEmpty() || lastName.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || residence.isEmpty() || selectedDepartmentId == -1 || position.isEmpty()) {
+            Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
             return;
         }
         if (imageBytes == null) {
@@ -137,8 +214,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
             return;
         }
 
-        Employee employee = new Employee(firstName, lastName, phoneNumber, email, residence, job);
-        employeeDAO = new EmployeeDAO(this);
+        Employee employee = new Employee(firstName, lastName, phoneNumber, email, selectedDepartmentId, position, residence);
         long result = employeeDAO.insertEmployee(employee, imageBytes);
 
         if (result != -1) {

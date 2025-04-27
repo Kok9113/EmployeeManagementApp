@@ -46,6 +46,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Thêm các activity mới cho quản lý phòng ban -->
+        <activity
+            android:name=".DepartmentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AddDepartmentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".DepartmentDetailsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".EditDepartmentActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

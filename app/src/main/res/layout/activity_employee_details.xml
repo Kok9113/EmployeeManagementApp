@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:context=".ui.employee.AddEmployeeActivity">
+        tools:context=".ui.employee.EmployeeDetails">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -39,7 +39,7 @@
                 android:paddingTop="15dp"
                 android:paddingBottom="15dp"
                 android:text="@string/DetailsTitle"
-                android:textColor='@color/textColor'
+                android:textColor="@color/textColor"
                 android:textSize="20sp" />
 
             <ImageView
@@ -86,13 +86,13 @@
                 android:contentDescription="Profile Picture"
                 android:scaleType="centerCrop"
                 android:src="@drawable/rounded_button_background" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="20sp"
-                android:gravity="center"
-                >
+                android:gravity="center">
                 <Button
                     android:id="@+id/button_edit_image"
                     android:layout_width="180sp"
@@ -114,7 +114,6 @@
                     android:onClick="openCamera2"/>
             </LinearLayout>
 
-
             <EditText
                 android:id="@+id/edittext_first_name"
                 android:layout_width="match_parent"
@@ -125,7 +124,6 @@
                 android:hint="@string/first_name_hint"
                 android:padding="15sp" />
 
-
             <EditText
                 android:id="@+id/edittext_last_name"
                 android:layout_width="match_parent"
@@ -135,7 +133,6 @@
                 android:background="@drawable/edittext_border"
                 android:hint="@string/last_name_hint"
                 android:padding="15sp" />
-
 
             <EditText
                 android:id="@+id/edittext_phone_number"
@@ -148,7 +145,6 @@
                 android:inputType="phone"
                 android:padding="15sp" />
 
-
             <EditText
                 android:id="@+id/edittext_email"
                 android:layout_width="match_parent"
@@ -160,17 +156,23 @@
                 android:inputType="textEmailAddress"
                 android:padding="15sp" />
 
-
-            <EditText
-                android:id="@+id/edittext_job"
+            <Spinner
+                android:id="@+id/spinner_department"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="20sp"
                 android:layout_marginTop="20sp"
                 android:background="@drawable/edittext_border"
-                android:hint="@string/job_hint"
                 android:padding="15sp" />
 
+            <Spinner
+                android:id="@+id/spinner_position"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20sp"
+                android:layout_marginTop="20sp"
+                android:background="@drawable/edittext_border"
+                android:padding="15sp" />
 
             <EditText
                 android:id="@+id/edittext_residence"
@@ -181,6 +183,7 @@
                 android:background="@drawable/edittext_border"
                 android:hint="@string/residence_hint"
                 android:padding="15sp" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

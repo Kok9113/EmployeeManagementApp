@@ -13,5 +13,6 @@ public class Constants {
     public static final String COLUMN_PHONE_NUMBER = "phone_number";
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_RESIDENCE = "residence";
-    public static final String COLUMN_JOB = "job";
+    public static final String COLUMN_DEPARTMENT_ID = "department_id";
+    public static final String COLUMN_POSITION = "position";
 }
