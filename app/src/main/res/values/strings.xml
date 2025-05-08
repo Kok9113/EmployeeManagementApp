@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App Info -->
     <string name="app_name">2PN</string>
     <string name="employee_image">Employee Image</string>
     <string name="title_activity_settings">SettingsActivity</string>
@@ -10,6 +11,13 @@
     <string name="menu_icon">Menu Icon</string>
     <string name="settings_icon">Settings Icon</string>
     <string name="departments_icon">Departments Icon</string>
+    <string name="no_employees_found">No employees found</string>
+    <string name="error_loading_employees">Error loading employees</string>
+
+    <!-- Menu Panel -->
+    <string name="menu_title">Menu</string>
+    <string name="menu_departments">Departments</string>
+    <string name="menu_settings">Settings</string>
 
     <!-- Details -->
     <string name="DetailsTitle">Employee Details</string>
@@ -17,7 +25,7 @@
     <string name="back_icon">Back</string>
     <string name="validate_icon">Validate</string>
 
-    <!-- Add Activity -->
+    <!-- Add Employee -->
     <string name="AddTitle">Add employee</string>
     <string name="gallery_title">Gallery</string>
     <string name="camera_title">Camera</string>
@@ -64,6 +72,7 @@
     <string name="department_updated_success">Department updated successfully</string>
     <string name="department_updated_failed">Failed to update department</string>
     <string name="error_loading_departments">Failed to search</string>
+    <string name="cannot_delete_department">Cannot delete department because it has associated employees</string>
 
     <!-- Preference Titles -->
     <string name="params_header">Settings</string>
@@ -72,13 +81,17 @@
     <string name="theme_on">Light Mode On</string>
     <string name="theme_off">Dark Mode On</string>
 
-    <string name="cannot_delete_department">Cannot delete department because it has associated employees</string>
+    <!-- Employee Messages -->
     <string name="employee_added_success">Employee added successfully</string>
     <string name="employee_added_failed">Failed to add employee</string>
     <string name="employee_updated_success">Employee updated successfully</string>
     <string name="employee_updated_failed">Failed to update employee</string>
     <string name="employee_deleted_success">Employee deleted successfully</string>
     <string name="employee_deleted_failed">Failed to delete employee</string>
-    <string name="no_employees_found">No employees found</string>
-    <string name="error_loading_employees">Error loading employees</string>
+    <string name="no_departments_found">No departments found</string>
+    <string name="select_department">Select Department</string>
+    <string name="cancel">Cancel</string>
+    <string name="all_departments">All Departments</string>
+    <string name="selected">Selected</string>
+    <string name="employees_in_department">Employees in %1$s</string>
 </resources>

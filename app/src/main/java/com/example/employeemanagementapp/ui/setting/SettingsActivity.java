@@ -1,5 +1,6 @@
 package com.example.employeemanagementapp.ui.setting;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -74,7 +75,7 @@ public class SettingsActivity extends AppCompatActivity {
         private void updateLocale(String lang) {
             Locale locale;
             if (lang.equals("Tiếng Việt")) {
-                locale = new Locale("vi"); // Sửa từ "ar" thành "vi"
+                locale = new Locale("vi");
             } else {
                 locale = Locale.ENGLISH;
             }
@@ -82,10 +83,18 @@ public class SettingsActivity extends AppCompatActivity {
                 Locale.setDefault(locale);
                 Configuration config = new Configuration();
                 config.setLocale(locale);
-
                 getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+
+                // Lưu ngôn ngữ mới
                 SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
                 preferences.edit().putString("selected_language", lang).apply();
+
+                // Gửi broadcast để thông báo cho các hoạt động khác
+                Intent intent = new Intent("LANGUAGE_CHANGED");
+                intent.putExtra("new_language", lang);
+                requireContext().sendBroadcast(intent);
+
+                // Tái tạo SettingsActivity
                 requireActivity().recreate();
             }
         }

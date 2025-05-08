@@ -4,5 +4,7 @@
     <color name="textColor">#FFFFFFFF</color>
     <color name="black">#000000</color>
     <color name="colorBack">#ffffff</color>
+    <color name="selected_item_background">#E0E0E0</color>
+    <color name="selected_item_text">#6200EE</color>
 
 </resources>

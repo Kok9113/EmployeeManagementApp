@@ -67,7 +67,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    // Kiểm tra xem phòng ban có nhân viên liên quan không
+    public Cursor getEmployeesByDepartment(long deptId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_EMPLOYEES + " WHERE " + COLUMN_DEPARTMENT_ID + " = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(deptId)});
+    }
+
+    // New method: Filter employees by department and name query
+    public Cursor getEmployeesByDepartmentFiltered(long deptId, String query) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String selection = COLUMN_DEPARTMENT_ID + " = ? AND (" + COLUMN_FIRST_NAME + " LIKE ? OR " + COLUMN_LAST_NAME + " LIKE ?)";
+        String[] selectionArgs = new String[]{String.valueOf(deptId), "%" + query + "%", "%" + query + "%"};
+        return db.query(TABLE_EMPLOYEES, null, selection, selectionArgs, null, null, null);
+    }
+
     public boolean hasEmployeesInDepartment(long departmentId) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(TABLE_EMPLOYEES, new String[]{COLUMN_ID},
@@ -78,7 +91,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return hasEmployees;
     }
 
-    // Employee CRUD methods
     public long insertEmployee(String firstName, String lastName, byte[] image, String phoneNumber, String email, String residence, long departmentId, String position) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -146,7 +158,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.query(TABLE_EMPLOYEES, null, selection, selectionArgs, null, null, null);
     }
 
-    // Department CRUD methods
     public long insertDepartment(String name, String positions) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -179,7 +190,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public int deleteDepartment(long id) {
         if (hasEmployeesInDepartment(id)) {
-            return -1; // Trả về -1 nếu có nhân viên liên quan
+            return -1;
         }
         SQLiteDatabase db = this.getWritableDatabase();
         int rowsDeleted = db.delete(TABLE_DEPARTMENTS, COLUMN_DEPT_ID + "=?", new String[]{String.valueOf(id)});

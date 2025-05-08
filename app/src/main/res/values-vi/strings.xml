@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App Info -->
     <string name="app_name">2PN</string>
     <string name="employee_image">Hình ảnh nhân viên</string>
     <string name="title_activity_settings">Cài đặt</string>
@@ -10,6 +11,13 @@
     <string name="menu_icon">Biểu tượng Menu</string>
     <string name="settings_icon">Biểu tượng Cài đặt</string>
     <string name="departments_icon">Biểu tượng Phòng ban</string>
+    <string name="no_employees_found">Không tìm thấy nhân viên</string>
+    <string name="error_loading_employees">Lỗi khi tải danh sách nhân viên</string>
+
+    <!-- Menu Panel -->
+    <string name="menu_title">Menu</string>
+    <string name="menu_departments">Phòng ban</string>
+    <string name="menu_settings">Cài đặt</string>
 
     <!-- Details -->
     <string name="DetailsTitle">Thông tin</string>
@@ -17,7 +25,7 @@
     <string name="back_icon">Quay lại</string>
     <string name="validate_icon">Xác nhận</string>
 
-    <!-- Add Activity -->
+    <!-- Add Employee -->
     <string name="AddTitle">Thêm thông tin</string>
     <string name="gallery_title">Thư viện</string>
     <string name="camera_title">Máy ảnh</string>
@@ -64,6 +72,7 @@
     <string name="department_updated_success">Cập nhật phòng ban thành công</string>
     <string name="department_updated_failed">Cập nhật phòng ban thất bại</string>
     <string name="error_loading_departments">Lỗi khi tải danh sách phòng ban</string>
+    <string name="cannot_delete_department">Không thể xóa phòng ban vì có nhân viên liên quan</string>
 
     <!-- Preference Titles -->
     <string name="params_header">Cài đặt</string>
@@ -72,13 +81,17 @@
     <string name="theme_on">Chế độ sáng</string>
     <string name="theme_off">Chế độ tối</string>
 
-    <string name="cannot_delete_department">Không thể xóa phòng ban vì có nhân viên liên quan</string>
+    <!-- Employee Messages -->
     <string name="employee_added_success">Thêm nhân viên thành công</string>
     <string name="employee_added_failed">Thêm nhân viên thất bại</string>
     <string name="employee_updated_success">Cập nhật nhân viên thành công</string>
     <string name="employee_updated_failed">Cập nhật nhân viên thất bại</string>
     <string name="employee_deleted_success">Xóa nhân viên thành công</string>
     <string name="employee_deleted_failed">Xóa nhân viên thất bại</string>
-    <string name="no_employees_found">Không tìm thấy nhân viên</string>
-    <string name="error_loading_employees">Lỗi khi tải danh sách nhân viên</string>
+    <string name="no_departments_found">Không tìm thấy phòng ban</string>
+    <string name="select_department">Chọn phòng ban</string>
+    <string name="cancel">Hủy</string>
+    <string name="all_departments">Tất cả phòng ban</string>
+    <string name="selected">Đã chọn</string>
+    <string name="employees_in_department">Nhân viên trong %1$s</string>
 </resources>
