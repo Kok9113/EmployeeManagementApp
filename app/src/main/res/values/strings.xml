@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">2PN</string>
+    <string name="employee_image">Employee Image</string>
+    <string name="title_activity_settings">SettingsActivity</string>
+
+    <!-- Home -->
+    <string name="list">List of Employees</string>
+    <string name="search_hint">Search for an Employee…</string>
+    <string name="menu_icon">Menu Icon</string>
+    <string name="settings_icon">Settings Icon</string>
+    <string name="departments_icon">Departments Icon</string>
+
+    <!-- Details -->
+    <string name="DetailsTitle">Employee Details</string>
+    <string name="DetailsUpdate">Update</string>
+    <string name="back_icon">Back</string>
+    <string name="validate_icon">Validate</string>
+
+    <!-- Add Activity -->
+    <string name="AddTitle">Add employee</string>
+    <string name="gallery_title">Gallery</string>
+    <string name="camera_title">Camera</string>
+    <string name="name_title">First Name</string>
+    <string name="surname_title">Last Name</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="email_title">Email</string>
+    <string name="department_title">Department</string>
+    <string name="position_title">Position</string>
+    <string name="residence_title">Residence</string>
+    <string name="first_name_hint">Enter the first Name</string>
+    <string name="last_name_hint">Enter the last Name</string>
+    <string name="phone_hint">Enter the phone Number</string>
+    <string name="mail_hint">Enter the Email</string>
+    <string name="department_hint">Select a Department</string>
+    <string name="position_hint">Select a Position</string>
+    <string name="residence_hint">Enter the Residence</string>
+
+    <!-- Department -->
+    <string name="department_list">List of Departments</string>
+    <string name="search_dept_hint">Search for a Department…</string>
+    <string name="add_department_title">Add Department</string>
+    <string name="dept_name_title">Department Name</string>
+    <string name="dept_name_hint">Enter the Department Name</string>
+    <string name="dept_positions_title">Positions</string>
+    <string name="dept_positions_hint">Enter positions (comma-separated)</string>
+    <string name="fill_all_fields">Please fill in all fields</string>
+    <string name="department_added_success">Department added successfully</string>
+    <string name="department_added_failed">Failed to add department</string>
+    <string name="department_details">Department Details</string>
+    <string name="department_name">Department Name</string>
+    <string name="department_positions">Positions</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="invalid_department_id">Invalid department ID</string>
+    <string name="department_not_found">Department not found</string>
+    <string name="confirm_delete">Confirm Delete</string>
+    <string name="delete_department_message">Are you sure you want to delete this department?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="department_deleted_success">Department deleted successfully</string>
+    <string name="department_deleted_failed">Failed to delete department</string>
+    <string name="edit_department">Edit Department</string>
+    <string name="department_updated_success">Department updated successfully</string>
+    <string name="department_updated_failed">Failed to update department</string>
+    <string name="error_loading_departments">Failed to search</string>
+
+    <!-- Preference Titles -->
+    <string name="params_header">Settings</string>
+    <string name="language_title">Language</string>
+    <string name="theme_title">Change Theme</string>
+    <string name="theme_on">Light Mode On</string>
+    <string name="theme_off">Dark Mode On</string>
+
+    <string name="cannot_delete_department">Cannot delete department because it has associated employees</string>
+    <string name="employee_added_success">Employee added successfully</string>
+    <string name="employee_added_failed">Failed to add employee</string>
+    <string name="employee_updated_success">Employee updated successfully</string>
+    <string name="employee_updated_failed">Failed to update employee</string>
+    <string name="employee_deleted_success">Employee deleted successfully</string>
+    <string name="employee_deleted_failed">Failed to delete employee</string>
+    <string name="no_employees_found">No employees found</string>
+    <string name="error_loading_employees">Error loading employees</string>
+</resources>
