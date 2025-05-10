@@ -42,6 +42,7 @@ import com.example.employeemanagementapp.db.model.User;
 import com.example.employeemanagementapp.ui.employee.AddEmployeeActivity;
 import com.example.employeemanagementapp.ui.employee.EmployeeDetails;
 import com.example.employeemanagementapp.ui.setting.SettingsActivity;
+import com.example.employeemanagementapp.db.dao.PermissionDAO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,8 +94,6 @@ public class MainActivity extends AppCompatActivity {
         IntentFilter filter = new IntentFilter("LANGUAGE_CHANGED");
         registerReceiver(languageChangeReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
         searchInput = findViewById(R.id.search_input);
-        settings = findViewById(R.id.settings);
-
 
         SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
         int userId = sharedPreferences.getInt("userId", -1);
@@ -108,12 +107,6 @@ public class MainActivity extends AppCompatActivity {
             User user = new User(userId, "");
             user.setPermissions(permissions);
             user.setRoles(roles);
-
-
-            //Dùng quyền để điều khiển UI
-            if (user.hasPermission("EDIT_EMPLOYEE")) {
-                settings.setVisibility(View.GONE);
-            }
 
             if (user.hasRole("admin")) {
                 searchInput.setVisibility(View.GONE);
@@ -185,10 +178,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        filterDepartmentButton = findViewById(R.id.button_add_department);
-        if (filterDepartmentButton != null) {
-            filterDepartmentButton.setOnClickListener(v -> showDepartmentListDialog());
-        }
+//        filterDepartmentButton = findViewById(R.id.button_add_department);
+//        if (filterDepartmentButton != null) {
+//            filterDepartmentButton.setOnClickListener(v -> showDepartmentListDialog());
+//        }
     }
 
     @Override

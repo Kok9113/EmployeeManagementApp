@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "employees.db";
-    private static final int DATABASE_VERSION = 7;
+    private static final int DATABASE_VERSION = 8;
 
     // Employee table
     public static final String TABLE_EMPLOYEES = "employees";
@@ -49,6 +49,36 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_DEPT_NAME + " TEXT, " +
                     COLUMN_DEPT_POSITIONS + " TEXT)";
 
+    private static final String TABLE_CREATE_USERS =
+            "CREATE TABLE Users (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "username TEXT NOT NULL, " +
+                    "password TEXT NOT NULL)";
+
+    private static final String TABLE_CREATE_ROLES =
+            "CREATE TABLE Roles (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "name TEXT NOT NULL)";
+
+    private static final String TABLE_CREATE_PERMISSIONS =
+            "CREATE TABLE Permissions (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "name TEXT NOT NULL)";
+
+    private static final String TABLE_CREATE_ROLE_PERMISSIONS =
+            "CREATE TABLE RolePermissions (" +
+                    "role_id INTEGER NOT NULL, " +
+                    "permission_id INTEGER NOT NULL, " +
+                    "FOREIGN KEY(role_id) REFERENCES Roles(id), " +
+                    "FOREIGN KEY(permission_id) REFERENCES Permissions(id))";
+
+    private static final String TABLE_CREATE_USER_ROLES =
+            "CREATE TABLE UserRoles (" +
+                    "user_id INTEGER NOT NULL, " +
+                    "role_id INTEGER NOT NULL, " +
+                    "FOREIGN KEY(user_id) REFERENCES Users(id), " +
+                    "FOREIGN KEY(role_id) REFERENCES Roles(id))";
+
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -57,6 +87,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(TABLE_CREATE_DEPARTMENTS);
         db.execSQL(TABLE_CREATE_EMPLOYEES);
+        db.execSQL(TABLE_CREATE_USERS);
+        db.execSQL(TABLE_CREATE_ROLES);
+        db.execSQL(TABLE_CREATE_PERMISSIONS);
+        db.execSQL(TABLE_CREATE_ROLE_PERMISSIONS);
+        db.execSQL(TABLE_CREATE_USER_ROLES);
     }
 
     @Override

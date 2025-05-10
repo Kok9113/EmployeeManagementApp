@@ -10,10 +10,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.employeemanagementapp.db.model.User;
-
-import java.util.List;
-
 public class LoginActivity extends AppCompatActivity {
 
     EditText emailEditText, passwordEditText;
@@ -37,6 +33,7 @@ public class LoginActivity extends AppCompatActivity {
                 String email = emailEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
 
+                Log.e("check", "error");
                 // Kiểm tra cơ bản
                 if (email.equals("admin") && password.equals("1234")) {
                     SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
