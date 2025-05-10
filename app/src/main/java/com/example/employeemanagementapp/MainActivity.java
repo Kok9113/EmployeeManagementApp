@@ -36,12 +36,16 @@ import androidx.preference.PreferenceManager;
 import com.example.employeemanagementapp.adapter.employee.EmployeeGridAdapter;
 import com.example.employeemanagementapp.db.DatabaseHelper;
 import com.example.employeemanagementapp.DepartmentActivity;
+import com.example.employeemanagementapp.db.dao.PermissionDAO;
+import com.example.employeemanagementapp.db.dao.RoleDAO;
+import com.example.employeemanagementapp.db.model.User;
 import com.example.employeemanagementapp.ui.employee.AddEmployeeActivity;
 import com.example.employeemanagementapp.ui.employee.EmployeeDetails;
 import com.example.employeemanagementapp.ui.setting.SettingsActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -52,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private SimpleCursorAdapter listAdapter;
     private EmployeeGridAdapter gridAdapter;
     private EditText searchInput;
+    private ImageView settings;
     private ListView listView;
     private GridLayout gridLayout;
     private TextView noEmployeesText;
@@ -87,6 +92,34 @@ public class MainActivity extends AppCompatActivity {
         // Đăng ký BroadcastReceiver với cờ RECEIVER_NOT_EXPORTED
         IntentFilter filter = new IntentFilter("LANGUAGE_CHANGED");
         registerReceiver(languageChangeReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        searchInput = findViewById(R.id.search_input);
+        settings = findViewById(R.id.settings);
+
+
+        SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
+        int userId = sharedPreferences.getInt("userId", -1);
+
+        if (userId != -1) {
+            PermissionDAO permissionDAO = new PermissionDAO(this);
+            List<String> permissions = permissionDAO.getUserPermissions(userId);
+            RoleDAO roleDAO = new RoleDAO(this);
+            List<String> roles = roleDAO.getUserRoles(userId); // tùy dùng hoặc bỏ
+
+            User user = new User(userId, "");
+            user.setPermissions(permissions);
+            user.setRoles(roles);
+
+
+            //Dùng quyền để điều khiển UI
+            if (user.hasPermission("EDIT_EMPLOYEE")) {
+                settings.setVisibility(View.GONE);
+            }
+
+            if (user.hasRole("admin")) {
+                searchInput.setVisibility(View.GONE);
+            }
+        }
+
 
         dbHelper = new DatabaseHelper(this);
         departmentMap = new HashMap<>();
@@ -107,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
 
         displayEmployees();
 
-        searchInput = findViewById(R.id.search_input);
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -266,6 +298,8 @@ public class MainActivity extends AppCompatActivity {
                 noEmployeesText.setVisibility(View.VISIBLE);
             }
         }
+
+
     }
 
     @Override
