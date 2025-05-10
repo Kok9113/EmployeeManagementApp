@@ -11,7 +11,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "employees.db";
     private static final int DATABASE_VERSION = 8;
-
     // Employee table
     public static final String TABLE_EMPLOYEES = "employees";
     public static final String COLUMN_ID = "_id";
@@ -29,6 +28,26 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DEPT_ID = "_id";
     public static final String COLUMN_DEPT_NAME = "name";
     public static final String COLUMN_DEPT_POSITIONS = "positions";
+
+    // User table
+    private static final String TABLE_USERS = "users";
+    private static final String COLUMN_USER_ID = "user_id";
+    private static final String COLUMN_USER_EMAIL = "email";
+    private static final String COLUMN_USER_PASSWORD = "password";
+    private static final String TABLE_ROLES = "Roles";
+    private static final String COLUMN_ROLE_ID = "role_id";
+    private static final String COLUMN_ROLE_NAME = "name";
+    private static final String TABLE_PERMISSIONS = "Permissions";
+    private static final String COLUMN_PERMISSION_ID = "permissions_id";
+    private static final String COLUMN_PERMISSION_NAME = "name";
+    private static final String TABLE_ROLE_PERMISSIONS = "RolePermissions";
+    private static final String TABLE_USER_ROLES = "UserRoles";
+
+    private static final String TABLE_CREATE_USERS =
+            "CREATE TABLE " + TABLE_USERS + " (" +
+                    COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_USER_EMAIL + " TEXT UNIQUE, " +
+                    COLUMN_USER_PASSWORD + " TEXT)";
 
     private static final String TABLE_CREATE_EMPLOYEES =
             "CREATE TABLE " + TABLE_EMPLOYEES + " (" +
@@ -49,35 +68,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_DEPT_NAME + " TEXT, " +
                     COLUMN_DEPT_POSITIONS + " TEXT)";
 
-    private static final String TABLE_CREATE_USERS =
-            "CREATE TABLE Users (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "username TEXT NOT NULL, " +
-                    "password TEXT NOT NULL)";
-
     private static final String TABLE_CREATE_ROLES =
-            "CREATE TABLE Roles (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "name TEXT NOT NULL)";
+            "CREATE TABLE " + TABLE_ROLES + " (" +
+                    COLUMN_ROLE_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_ROLE_NAME + " TEXT NOT NULL)";
 
     private static final String TABLE_CREATE_PERMISSIONS =
-            "CREATE TABLE Permissions (" +
-                    "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    "name TEXT NOT NULL)";
+            "CREATE TABLE " + TABLE_PERMISSIONS + " (" +
+                    COLUMN_PERMISSION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    COLUMN_PERMISSION_NAME + " TEXT NOT NULL)";
 
     private static final String TABLE_CREATE_ROLE_PERMISSIONS =
-            "CREATE TABLE RolePermissions (" +
-                    "role_id INTEGER NOT NULL, " +
-                    "permission_id INTEGER NOT NULL, " +
-                    "FOREIGN KEY(role_id) REFERENCES Roles(id), " +
-                    "FOREIGN KEY(permission_id) REFERENCES Permissions(id))";
-
+            "CREATE TABLE " + TABLE_ROLE_PERMISSIONS + " (" +
+                    COLUMN_ROLE_ID + " INTEGER NOT NULL, " +
+                    COLUMN_PERMISSION_ID + " INTEGER NOT NULL, " +
+                    "FOREIGN KEY(" + COLUMN_ROLE_ID + ") REFERENCES " + TABLE_ROLES + "(" + COLUMN_ROLE_ID + "), " +
+                    "FOREIGN KEY(" + COLUMN_PERMISSION_ID + ") REFERENCES " + TABLE_PERMISSIONS + "(" + COLUMN_PERMISSION_ID + "), " +
+                    "PRIMARY KEY(" + COLUMN_ROLE_ID + ", " + COLUMN_PERMISSION_ID + "))";
     private static final String TABLE_CREATE_USER_ROLES =
-            "CREATE TABLE UserRoles (" +
-                    "user_id INTEGER NOT NULL, " +
-                    "role_id INTEGER NOT NULL, " +
-                    "FOREIGN KEY(user_id) REFERENCES Users(id), " +
-                    "FOREIGN KEY(role_id) REFERENCES Roles(id))";
+            "CREATE TABLE " + TABLE_USER_ROLES + " (" +
+                    COLUMN_USER_ID + " INTEGER NOT NULL, " +
+                    COLUMN_ROLE_ID + " INTEGER NOT NULL, " +
+                    "FOREIGN KEY(" + COLUMN_USER_ID + ") REFERENCES " + TABLE_USERS + "(" + COLUMN_USER_ID + "), " +
+                    "FOREIGN KEY(" + COLUMN_ROLE_ID + ") REFERENCES " + TABLE_ROLES + "(" + COLUMN_ROLE_ID + "), " +
+                    "PRIMARY KEY(" + COLUMN_USER_ID + ", " + COLUMN_ROLE_ID + "))";
+
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -99,6 +114,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion < 7) {
             db.execSQL("ALTER TABLE " + TABLE_EMPLOYEES + " ADD COLUMN " + COLUMN_DEPARTMENT_ID + " INTEGER");
             db.execSQL("ALTER TABLE " + TABLE_EMPLOYEES + " ADD COLUMN " + COLUMN_POSITION + " TEXT");
+        }
+        if (oldVersion < 8) {
+            db.execSQL(TABLE_CREATE_USERS);
         }
     }
 
@@ -239,4 +257,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] selectionArgs = new String[]{"%" + query + "%"};
         return db.query(TABLE_DEPARTMENTS, null, selection, selectionArgs, null, null, null);
     }
+
+    // Đăng ký người dùng mới
+    public boolean registerUser(String email, String password) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_EMAIL, email);
+        values.put(COLUMN_USER_PASSWORD, password);
+
+        long result = db.insert(TABLE_USERS, null, values);
+        return result != -1;
+    }
+
+    // Kiểm tra thông tin đăng nhập
+
+    public boolean checkLogin(String email, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_USERS,
+                new String[]{COLUMN_USER_ID},
+                COLUMN_USER_EMAIL + "=? AND " + COLUMN_USER_PASSWORD + "=?",
+                new String[]{email, password},
+                null, null, null);
+        boolean exists = (cursor.getCount() > 0);
+        cursor.close();
+        return exists;
+    }
+
+
 }

@@ -8,54 +8,57 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.employeemanagementapp.db.DatabaseHelper;
 
 public class LoginActivity extends AppCompatActivity {
 
     EditText emailEditText, passwordEditText;
     Button loginBtn, registerBtn;
 
+    DatabaseHelper dbHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_layout); // liên kết với layout bạn gửi
+        setContentView(R.layout.login_layout); // layout của form đăng nhập
 
-        // Liên kết các view
         emailEditText = findViewById(R.id.editTextTextEmailAddress);
         passwordEditText = findViewById(R.id.editTextNumberPassword);
         loginBtn = findViewById(R.id.dang_nhap);
         registerBtn = findViewById(R.id.dang_ky);
 
-        // Sự kiện nút Đăng nhập
+        dbHelper = new DatabaseHelper(this); // Khởi tạo SQLite helper
+
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String email = emailEditText.getText().toString();
+                String email = emailEditText.getText().toString().trim();
                 String password = passwordEditText.getText().toString();
-
-                Log.e("check", "error");
-                // Kiểm tra cơ bản
-                if (email.equals("admin") && password.equals("1234")) {
-                    SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putInt("userId", 1);
-                    editor.apply();
-
-
-                    // Nếu đúng thì chuyển sang MainActivity
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish(); // không cho quay lại màn hình đăng nhập
+                Log.e("a","a");
+                if (email.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(LoginActivity.this, "Vui lòng nhập email và mật khẩu", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(LoginActivity.this, "Sai tài khoản hoặc mật khẩu", Toast.LENGTH_SHORT).show();
+                    boolean isValid = dbHelper.checkLogin(email, password);
+                    if (isValid) {
+                        // Đăng nhập thành công
+                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish(); // không quay lại login
+                    } else {
+                        // Sai tài khoản
+                        Toast.makeText(LoginActivity.this, "Sai email hoặc mật khẩu", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
 
-        // Sự kiện nút Đăng ký (nếu bạn có RegisterActivity)
         registerBtn.setOnClickListener(view -> {
-            // Ví dụ: Toast hoặc mở RegisterActivity
-            Toast.makeText(LoginActivity.this, "Chức năng đang phát triển", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
         });
     }
 }

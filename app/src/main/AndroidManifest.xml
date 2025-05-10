@@ -30,6 +30,10 @@
         </activity>
 
         <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.setting.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings" />
@@ -38,9 +42,7 @@
             android:exported="false" >
             <intent-filter>
                 <action android:name="android.intent.action.SENDTO" />
-
                 <data android:scheme="mailto" />
-
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
@@ -52,7 +54,6 @@
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
