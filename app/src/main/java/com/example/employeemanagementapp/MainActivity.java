@@ -30,19 +30,20 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
 import com.example.employeemanagementapp.adapter.employee.EmployeeGridAdapter;
 import com.example.employeemanagementapp.db.DatabaseHelper;
-import com.example.employeemanagementapp.DepartmentActivity;
+import com.example.employeemanagementapp.ui.department.DepartmentActivity;
+import com.example.employeemanagementapp.db.dao.DepartmentDAO;
+import com.example.employeemanagementapp.db.dao.EmployeeDAO;
 import com.example.employeemanagementapp.db.dao.PermissionDAO;
 import com.example.employeemanagementapp.db.dao.RoleDAO;
 import com.example.employeemanagementapp.db.model.User;
 import com.example.employeemanagementapp.ui.employee.AddEmployeeActivity;
 import com.example.employeemanagementapp.ui.employee.EmployeeDetails;
 import com.example.employeemanagementapp.ui.setting.SettingsActivity;
-import com.example.employeemanagementapp.db.dao.PermissionDAO;
+import com.example.employeemanagementapp.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int ADD_EMPLOYEE_REQUEST_CODE = 1;
 
-    private DatabaseHelper dbHelper;
+    private DepartmentDAO departmentDAO;
     private SimpleCursorAdapter listAdapter;
     private EmployeeGridAdapter gridAdapter;
     private EditText searchInput;
@@ -113,8 +114,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-
-        dbHelper = new DatabaseHelper(this);
+        departmentDAO = new DepartmentDAO(this);
         departmentMap = new HashMap<>();
         loadDepartments();
 
@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                @SuppressLint("Range") long employeeId = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID));
+                @SuppressLint("Range") long employeeId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_ID));
                 showEmployeeDetails(employeeId);
             }
         });
@@ -190,8 +190,86 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(languageChangeReceiver); // Hủy đăng ký receiver khi hoạt động bị hủy
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        applyLanguage();
+        updateHeaderTitle();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        applyLanguage();
+        departmentMap.clear();
+        loadDepartments();
+        displayEmployees();
+        updateHeaderTitle();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == ADD_EMPLOYEE_REQUEST_CODE && resultCode == RESULT_OK) {
+            displayEmployees();
+        }
+    }
+
+    @SuppressLint("Range")
+    private void updateGridLayout(GridLayout gridLayout, Cursor cursor) {
+        gridLayout.removeAllViews();
+        if (cursor == null || !cursor.moveToFirst()) {
+            return;
+        }
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        while (!cursor.isAfterLast()) {
+            View itemView = inflater.inflate(R.layout.grid_item_layout, gridLayout, false);
+            TextView nameTextView = itemView.findViewById(R.id.text_name);
+            TextView lastNameTextView = itemView.findViewById(R.id.text_lastname);
+            TextView jobTextView = itemView.findViewById(R.id.text_job);
+
+            String firstName = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_FIRST_NAME));
+            String lastName = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_LAST_NAME));
+            long deptId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_DEPARTMENT_ID));
+            String position = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_POSITION)) != null ?
+                    cursor.getString(cursor.getColumnIndex(Constants.COLUMN_POSITION)) : "";
+
+            String deptName = departmentMap.getOrDefault(deptId, "Unknown");
+            nameTextView.setText(firstName != null ? firstName : "");
+            lastNameTextView.setText(lastName != null ? lastName : "");
+            jobTextView.setText(deptName + " - " + position);
+
+            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
+            params.width = GridLayout.LayoutParams.WRAP_CONTENT;
+            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
+            params.setMargins(8, 8, 8, 8);
+            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f);
+            itemView.setLayoutParams(params);
+
+            final long employeeId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_ID));
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showEmployeeDetails(employeeId);
+                }
+            });
+
+            gridLayout.addView(itemView);
+            cursor.moveToNext();
+        }
+    }
+
+    private void updateHeaderTitle() {
+        if (selectedDeptId == -1) {
+            headerTitle.setText(R.string.list);
+        } else {
+            String deptName = departmentMap.getOrDefault(selectedDeptId, "Unknown");
+            headerTitle.setText(getString(R.string.employees_in_department, deptName));
+        }
+    }
     private void showDepartmentListDialog() {
-        Cursor cursor = dbHelper.getAllDepartments();
+        Cursor cursor = departmentDAO.getAllDepartments();
         ArrayList<String> departmentNames = new ArrayList<>();
         ArrayList<Long> departmentIds = new ArrayList<>();
 
@@ -201,8 +279,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_ID));
-                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_NAME));
+                @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_DEPT_ID));
+                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DEPT_NAME));
                 departmentNames.add(name != null ? name : "Unknown");
                 departmentIds.add(id);
             } while (cursor.moveToNext());
@@ -251,23 +329,14 @@ public class MainActivity extends AppCompatActivity {
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
     }
-
-    private void updateHeaderTitle() {
-        if (selectedDeptId == -1) {
-            headerTitle.setText(R.string.list);
-        } else {
-            String deptName = departmentMap.getOrDefault(selectedDeptId, "Unknown");
-            headerTitle.setText(getString(R.string.employees_in_department, deptName));
-        }
-    }
-
     private void filterEmployeesByDepartment(long deptId) {
         Cursor cursor = null;
+        EmployeeDAO employeeDAO = new EmployeeDAO(this);
         try {
             if (deptId == -1) {
-                cursor = dbHelper.getAllEmployees();
+                cursor = employeeDAO.getAllEmployees();
             } else {
-                cursor = dbHelper.getEmployeesByDepartment(deptId);
+                cursor = employeeDAO.getEmployeesByDepartment(deptId);
             }
             if (cursor == null) {
                 Log.e("MainActivity", "Cursor is null in filterEmployeesByDepartment for deptId: " + deptId);
@@ -294,56 +363,29 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        applyLanguage();
-        departmentMap.clear();
-        loadDepartments();
-        displayEmployees();
-        updateHeaderTitle();
-    }
-
-    private void openMenu() {
-        menuPanel.setVisibility(View.VISIBLE);
-        overlay.setVisibility(View.VISIBLE);
-        overlay.animate().alpha(0.5f).setDuration(200).start();
-        menuPanel.setTranslationX(-menuPanel.getWidth());
-        menuPanel.animate().translationX(0).setDuration(300).start();
-        isMenuOpen = true;
-        refreshMenu(); // Làm mới menu khi mở
-    }
-
-    private void closeMenu() {
-        overlay.animate().alpha(0f).setDuration(200).withEndAction(() -> overlay.setVisibility(View.GONE)).start();
-        menuPanel.animate().translationX(-menuPanel.getWidth()).setDuration(300).withEndAction(() -> menuPanel.setVisibility(View.GONE)).start();
-        isMenuOpen = false;
-    }
-
     private void loadDepartments() {
-        Cursor cursor = dbHelper.getAllDepartments();
+        Cursor cursor = departmentDAO.getAllDepartments();
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_ID));
-                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_NAME));
+                @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_DEPT_ID));
+                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DEPT_NAME));
                 departmentMap.put(id, name != null ? name : "Unknown");
             } while (cursor.moveToNext());
             cursor.close();
         }
     }
-
     private void displayEmployees() {
         Cursor cursor = null;
+        EmployeeDAO employeeDAO = new EmployeeDAO(this);
         try {
-            cursor = selectedDeptId == -1 ? dbHelper.getAllEmployees() : dbHelper.getEmployeesByDepartment(selectedDeptId);
+            cursor = selectedDeptId == -1 ? employeeDAO.getAllEmployees() : employeeDAO.getEmployeesByDepartment(selectedDeptId);
             if (cursor != null && cursor.moveToFirst()) {
                 if (listAdapter == null) {
                     listAdapter = new SimpleCursorAdapter(
                             this,
                             R.layout.list_item_layout,
                             cursor,
-                            new String[]{DatabaseHelper.COLUMN_FIRST_NAME, DatabaseHelper.COLUMN_LAST_NAME, DatabaseHelper.COLUMN_POSITION},
+                            new String[]{Constants.COLUMN_FIRST_NAME, Constants.COLUMN_LAST_NAME, Constants.COLUMN_POSITION},
                             new int[]{R.id.text_name, R.id.text_lastname, R.id.text_job},
                             0) {
                         @Override
@@ -356,8 +398,8 @@ public class MainActivity extends AppCompatActivity {
                                     return;
                                 }
                                 try {
-                                    int positionIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_POSITION);
-                                    int deptIdIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPARTMENT_ID);
+                                    int positionIndex = cursor.getColumnIndex(Constants.COLUMN_POSITION);
+                                    int deptIdIndex = cursor.getColumnIndex(Constants.COLUMN_DEPARTMENT_ID);
                                     String position = positionIndex != -1 && cursor.getString(positionIndex) != null ? cursor.getString(positionIndex) : "";
                                     long deptId = deptIdIndex != -1 ? cursor.getLong(deptIdIndex) : -1;
                                     String deptName = deptId != -1 ? departmentMap.getOrDefault(deptId, "Unknown") : "Unknown";
@@ -409,14 +451,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
     private void filterEmployeeList(String query) {
         Cursor cursor = null;
+        EmployeeDAO employeeDAO = new EmployeeDAO(this);
         try {
             if (selectedDeptId == -1) {
-                cursor = dbHelper.getAllEmployeesFiltered(query);
+                cursor = employeeDAO.getAllEmployeesFiltered(query);
             } else {
-                cursor = dbHelper.getEmployeesByDepartmentFiltered(selectedDeptId, query);
+                cursor = employeeDAO.getEmployeesByDepartmentFiltered(selectedDeptId, query);
             }
             if (cursor == null) {
                 Log.e("MainActivity", "Cursor is null in filterEmployeeList for query: " + query);
@@ -441,103 +483,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-    @SuppressLint("Range")
-    private void updateGridLayout(GridLayout gridLayout, Cursor cursor) {
-        gridLayout.removeAllViews();
-        if (cursor == null || !cursor.moveToFirst()) {
-            return;
-        }
-
-        LayoutInflater inflater = LayoutInflater.from(this);
-        while (!cursor.isAfterLast()) {
-            View itemView = inflater.inflate(R.layout.grid_item_layout, gridLayout, false);
-            TextView nameTextView = itemView.findViewById(R.id.text_name);
-            TextView lastNameTextView = itemView.findViewById(R.id.text_lastname);
-            TextView jobTextView = itemView.findViewById(R.id.text_job);
-
-            String firstName = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_FIRST_NAME));
-            String lastName = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_NAME));
-            long deptId = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPARTMENT_ID));
-            String position = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_POSITION)) != null ?
-                    cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_POSITION)) : "";
-
-            String deptName = departmentMap.getOrDefault(deptId, "Unknown");
-            nameTextView.setText(firstName != null ? firstName : "");
-            lastNameTextView.setText(lastName != null ? lastName : "");
-            jobTextView.setText(deptName + " - " + position);
-
-            GridLayout.LayoutParams params = new GridLayout.LayoutParams();
-            params.width = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.height = GridLayout.LayoutParams.WRAP_CONTENT;
-            params.setMargins(8, 8, 8, 8);
-            params.columnSpec = GridLayout.spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f);
-            itemView.setLayoutParams(params);
-
-            final long employeeId = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_ID));
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showEmployeeDetails(employeeId);
-                }
-            });
-
-            gridLayout.addView(itemView);
-            cursor.moveToNext();
-        }
-    }
-
     private void showEmployeeDetails(long employeeId) {
         Intent intent = new Intent(MainActivity.this, EmployeeDetails.class);
         intent.putExtra("employeeId", employeeId);
         startActivity(intent);
     }
-
-    public void GoToSettings(View view) {
-        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-        startActivity(intent);
-        closeMenu();
-    }
-
     public void goToDepartments(View view) {
         Intent intent = new Intent(MainActivity.this, DepartmentActivity.class);
         startActivity(intent);
         closeMenu();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == ADD_EMPLOYEE_REQUEST_CODE && resultCode == RESULT_OK) {
-            displayEmployees();
-        }
-    }
-
-    private void applyLanguage() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String selectedLanguage = preferences.getString("selected_language", "");
-        Log.d("selected language", selectedLanguage);
-        Locale newLocale;
-        if (selectedLanguage != null && selectedLanguage.equals("Tiếng Việt")) {
-            newLocale = new Locale("vi");
-        } else {
-            newLocale = Locale.ENGLISH;
-        }
-        Locale.setDefault(newLocale);
-        Configuration config = new Configuration();
-        config.setLocale(newLocale);
-        getBaseContext().getResources().updateConfiguration(config,
-                getBaseContext().getResources().getDisplayMetrics());
-        refreshMenu(); // Làm mới menu sau khi áp dụng ngôn ngữ
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        applyLanguage();
-        updateHeaderTitle();
-    }
-
+    // MENU
     private void refreshMenu() {
         if (menuPanel != null) {
             // Tìm LinearLayout chứa TextView
@@ -559,4 +516,44 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    private void openMenu() {
+        menuPanel.setVisibility(View.VISIBLE);
+        overlay.setVisibility(View.VISIBLE);
+        overlay.animate().alpha(0.5f).setDuration(200).start();
+        menuPanel.setTranslationX(-menuPanel.getWidth());
+        menuPanel.animate().translationX(0).setDuration(300).start();
+        isMenuOpen = true;
+        refreshMenu(); // Làm mới menu khi mở
+    }
+    private void closeMenu() {
+        overlay.animate().alpha(0f).setDuration(200).withEndAction(() -> overlay.setVisibility(View.GONE)).start();
+        menuPanel.animate().translationX(-menuPanel.getWidth()).setDuration(300).withEndAction(() -> menuPanel.setVisibility(View.GONE)).start();
+        isMenuOpen = false;
+    }
+    public void GoToSettings(View view) {
+        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(intent);
+        closeMenu();
+    }
+
+
+    // Language
+    private void applyLanguage() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String selectedLanguage = preferences.getString("selected_language", "");
+        Log.d("selected language", selectedLanguage);
+        Locale newLocale;
+        if (selectedLanguage != null && selectedLanguage.equals("Tiếng Việt")) {
+            newLocale = new Locale("vi");
+        } else {
+            newLocale = Locale.ENGLISH;
+        }
+        Locale.setDefault(newLocale);
+        Configuration config = new Configuration();
+        config.setLocale(newLocale);
+        getBaseContext().getResources().updateConfiguration(config,
+                getBaseContext().getResources().getDisplayMetrics());
+        refreshMenu(); // Làm mới menu sau khi áp dụng ngôn ngữ
+    }
+
 }

@@ -11,17 +11,19 @@ import android.widget.TextView;
 
 import com.example.employeemanagementapp.R;
 import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.db.dao.DepartmentDAO;
 import com.example.employeemanagementapp.db.model.Employee;
+import com.example.employeemanagementapp.utils.Constants;
 
 import java.util.ArrayList;
 
 public class EmployeeListAdapter extends ArrayAdapter<Employee> {
 
-    private DatabaseHelper dbHelper;
+    private DepartmentDAO departmentDAO;
 
     public EmployeeListAdapter(Context context, ArrayList<Employee> employees) {
         super(context, 0, employees);
-        dbHelper = new DatabaseHelper(context);
+        departmentDAO = new DepartmentDAO(context);
     }
 
     @Override
@@ -38,9 +40,9 @@ public class EmployeeListAdapter extends ArrayAdapter<Employee> {
         firstLastNameTextView.setText(employee.getFirstName() + " " + employee.getLastName());
 
         String departmentName = "Unknown";
-        Cursor deptCursor = dbHelper.getDepartmentById(employee.getDepartmentId());
+        Cursor deptCursor = departmentDAO.getDepartmentById(employee.getDepartmentId());
         if (deptCursor != null && deptCursor.moveToFirst()) {
-            @SuppressLint("Range") String name = deptCursor.getString(deptCursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_NAME));
+            @SuppressLint("Range") String name = deptCursor.getString(deptCursor.getColumnIndex(Constants.COLUMN_DEPT_NAME));
             departmentName = name != null ? name : "Unknown";
             deptCursor.close();
         }

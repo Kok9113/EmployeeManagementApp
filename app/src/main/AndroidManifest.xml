@@ -21,7 +21,7 @@
         tools:targetApi="31" >
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".ui.user.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -30,7 +30,7 @@
         </activity>
 
         <activity
-            android:name=".RegisterActivity"
+            android:name=".ui.user.RegisterActivity"
             android:exported="false" />
 
         <activity
@@ -59,16 +59,16 @@
         </activity>
         <!-- Thêm các activity mới cho quản lý phòng ban -->
         <activity
-            android:name=".DepartmentActivity"
+            android:name=".ui.department.DepartmentActivity"
             android:exported="false" />
         <activity
-            android:name=".AddDepartmentActivity"
+            android:name=".ui.department.AddDepartmentActivity"
             android:exported="false" />
         <activity
-            android:name=".DepartmentDetailsActivity"
+            android:name=".ui.department.DepartmentDetailsActivity"
             android:exported="false" />
         <activity
-            android:name=".EditDepartmentActivity"
+            android:name=".ui.department.EditDepartmentActivity"
             android:exported="false" />
     </application>
 

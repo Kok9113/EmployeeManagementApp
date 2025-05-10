@@ -1,7 +1,6 @@
-package com.example.employeemanagementapp;
+package com.example.employeemanagementapp.ui.user;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,14 +10,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.MainActivity;
+import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.dao.UserDAO;
 
 public class LoginActivity extends AppCompatActivity {
 
     EditText emailEditText, passwordEditText;
     Button loginBtn, registerBtn;
 
-    DatabaseHelper dbHelper;
+    UserDAO userDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,18 +31,18 @@ public class LoginActivity extends AppCompatActivity {
         loginBtn = findViewById(R.id.dang_nhap);
         registerBtn = findViewById(R.id.dang_ky);
 
-        dbHelper = new DatabaseHelper(this); // Khởi tạo SQLite helper
+        userDAO = new UserDAO(this); // Khởi tạo SQLite helper
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String email = emailEditText.getText().toString().trim();
+                String username = emailEditText.getText().toString().trim();
                 String password = passwordEditText.getText().toString();
                 Log.e("a","a");
-                if (email.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "Vui lòng nhập email và mật khẩu", Toast.LENGTH_SHORT).show();
+                if (username.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(LoginActivity.this, "Vui lòng nhập tên đăng nhập và mật khẩu", Toast.LENGTH_SHORT).show();
                 } else {
-                    boolean isValid = dbHelper.checkLogin(email, password);
+                    boolean isValid = userDAO.checkLogin(username, password);
                     if (isValid) {
                         // Đăng nhập thành công
                         Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
@@ -50,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
                         finish(); // không quay lại login
                     } else {
                         // Sai tài khoản
-                        Toast.makeText(LoginActivity.this, "Sai email hoặc mật khẩu", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Sai tên đăng nhập hoặc mật khẩu", Toast.LENGTH_SHORT).show();
                     }
                 }
             }

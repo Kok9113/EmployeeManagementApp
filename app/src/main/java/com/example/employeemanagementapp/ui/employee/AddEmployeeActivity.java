@@ -22,8 +22,10 @@ import androidx.preference.PreferenceManager;
 
 import com.example.employeemanagementapp.R;
 import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.db.dao.DepartmentDAO;
 import com.example.employeemanagementapp.db.dao.EmployeeDAO;
 import com.example.employeemanagementapp.db.model.Employee;
+import com.example.employeemanagementapp.utils.Constants;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -37,7 +39,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
     private Spinner spinnerDepartment, spinnerPosition;
     private ImageView imageViewValidate, imageViewBack, imageView;
     private EmployeeDAO employeeDAO;
-    private DatabaseHelper dbHelper;
+    private DepartmentDAO departmentDAO;
     private List<Department> departments;
     private long selectedDepartmentId;
 
@@ -71,8 +73,8 @@ public class AddEmployeeActivity extends AppCompatActivity {
         imageView = findViewById(R.id.image_profile);
         imageView.setImageResource(R.drawable.ic_launcher_background);
 
-        dbHelper = new DatabaseHelper(this);
         employeeDAO = new EmployeeDAO(this);
+        departmentDAO = new DepartmentDAO(this);
 
         loadDepartments();
 
@@ -107,12 +109,12 @@ public class AddEmployeeActivity extends AppCompatActivity {
 
     private void loadDepartments() {
         departments = new ArrayList<>();
-        Cursor cursor = dbHelper.getAllDepartments();
+        Cursor cursor = departmentDAO.getAllDepartments();
         if (cursor != null && cursor.moveToFirst()) {
             do {
-                @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_ID));
-                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_NAME));
-                @SuppressLint("Range") String positions = cursor.getString(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_POSITIONS));
+                @SuppressLint("Range") long id = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_DEPT_ID));
+                @SuppressLint("Range") String name = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DEPT_NAME));
+                @SuppressLint("Range") String positions = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_DEPT_POSITIONS));
                 departments.add(new Department(id, name, positions));
             } while (cursor.moveToNext());
             cursor.close();

@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,10 @@ public class RoleDAO {
     }
     public List<String> getUserRoles(int userId) {
         List<String> roles = new ArrayList<>();
-        String query = "SELECT r.name FROM Roles r " +
-                "JOIN UserRoles ur ON r.id = ur.role_id " +
-                "WHERE ur.user_id = ?";
+        String query = "SELECT r." + Constants.COLUMN_ROLE_NAME + " " +
+                "FROM " + Constants.TABLE_ROLES + " r " +
+                "JOIN " + Constants.TABLE_USER_ROLES + " ur ON r." + Constants.COLUMN_ROLE_ID + " = ur." + Constants.COLUMN_ROLE_IDD + " " +
+                "WHERE ur." + Constants.COLUMN_USER_ID + " = ?";
 
         Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)});
         if (cursor != null && cursor.moveToFirst()) {

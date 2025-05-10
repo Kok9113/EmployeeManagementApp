@@ -1,4 +1,4 @@
-package com.example.employeemanagementapp;
+package com.example.employeemanagementapp.ui.department;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,17 +20,19 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.preference.PreferenceManager;
 
 
-import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.dao.DepartmentDAO;
+import com.example.employeemanagementapp.utils.Constants;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Locale;
 
 public class DepartmentDetailsActivity extends AppCompatActivity {
 
     private static final int EDIT_DEPARTMENT_REQUEST_CODE = 3;
 
-    private DatabaseHelper dbHelper;
+    private DepartmentDAO departmentDAO;
+
     private long departmentId;
     private TextView textDeptName;
     private ListView listPositions;
@@ -42,7 +44,7 @@ public class DepartmentDetailsActivity extends AppCompatActivity {
         applyLanguage();
         setContentView(R.layout.activity_department_details);
 
-        dbHelper = new DatabaseHelper(this);
+        departmentDAO = new DepartmentDAO(this);
 
         // Thiết lập Toolbar
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -100,11 +102,12 @@ public class DepartmentDetailsActivity extends AppCompatActivity {
 
     private void loadDepartmentDetails() {
         Cursor cursor = null;
+
         try {
-            cursor = dbHelper.getDepartmentById(departmentId);
+            cursor = departmentDAO.getDepartmentById(departmentId);
             if (cursor != null && cursor.moveToFirst()) {
-                int nameIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_NAME);
-                int positionsIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_POSITIONS);
+                int nameIndex = cursor.getColumnIndex(Constants.COLUMN_DEPT_NAME);
+                int positionsIndex = cursor.getColumnIndex(Constants.COLUMN_DEPT_POSITIONS);
 
                 if (nameIndex == -1 || positionsIndex == -1) {
                     Log.e("DepartmentDetails", "Column not found: nameIndex=" + nameIndex + ", positionsIndex=" + positionsIndex);
@@ -161,7 +164,7 @@ public class DepartmentDetailsActivity extends AppCompatActivity {
     }
 
     private void deleteDepartment() {
-        int rowsDeleted = dbHelper.deleteDepartment(departmentId);
+        int rowsDeleted = departmentDAO.deleteDepartment(this, departmentId);
         if (rowsDeleted > 0) {
             Toast.makeText(this, R.string.department_deleted_success, Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);

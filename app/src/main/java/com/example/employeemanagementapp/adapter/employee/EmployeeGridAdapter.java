@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.example.employeemanagementapp.R;
 import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.utils.Constants;
 
 import java.util.HashMap;
 
@@ -68,11 +69,11 @@ public class EmployeeGridAdapter extends BaseAdapter {
 
         try {
             if (mCursor != null && mCursor.moveToPosition(position)) {
-                @SuppressLint("Range") String firstName = mCursor.getString(mCursor.getColumnIndex(DatabaseHelper.COLUMN_FIRST_NAME));
-                @SuppressLint("Range") String lastName = mCursor.getString(mCursor.getColumnIndex(DatabaseHelper.COLUMN_LAST_NAME));
-                @SuppressLint("Range") long departmentId = mCursor.getLong(mCursor.getColumnIndex(DatabaseHelper.COLUMN_DEPARTMENT_ID));
-                @SuppressLint("Range") String employeePosition = mCursor.getString(mCursor.getColumnIndex(DatabaseHelper.COLUMN_POSITION)) != null ?
-                        mCursor.getString(mCursor.getColumnIndex(DatabaseHelper.COLUMN_POSITION)) : "";
+                @SuppressLint("Range") String firstName = mCursor.getString(mCursor.getColumnIndex(Constants.COLUMN_FIRST_NAME));
+                @SuppressLint("Range") String lastName = mCursor.getString(mCursor.getColumnIndex(Constants.COLUMN_LAST_NAME));
+                @SuppressLint("Range") long departmentId = mCursor.getLong(mCursor.getColumnIndex(Constants.COLUMN_DEPARTMENT_ID));
+                @SuppressLint("Range") String employeePosition = mCursor.getString(mCursor.getColumnIndex(Constants.COLUMN_POSITION)) != null ?
+                        mCursor.getString(mCursor.getColumnIndex(Constants.COLUMN_POSITION)) : "";
 
                 String departmentName = departmentMap.getOrDefault(departmentId, "Unknown");
 

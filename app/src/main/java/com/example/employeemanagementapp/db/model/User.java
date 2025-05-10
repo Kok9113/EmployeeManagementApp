@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    private int id;
+    private int user_id;
     private String username;
     private String password;
     private List<String> roles;       // Danh sách vai trò (ví dụ: "admin", "manager")
     private List<String> permissions; // Danh sách quyền (ví dụ: "VIEW_EMPLOYEE", "EDIT_USER")
 
     // Constructor đầy đủ
-    public User(int id, String username, String password) {
-        this.id = id;
+    public User(int user_id, String username, String password) {
+        this.user_id = user_id;
         this.username = username;
         this.password = password;
         this.roles = new ArrayList<>();
@@ -33,11 +33,11 @@ public class User {
 
     // Getter & Setter
     public int getId() {
-        return id;
+        return user_id;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.user_id = id;
     }
 
     public String getUsername() {
@@ -86,7 +86,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "id=" + user_id +
                 ", username='" + username + '\'' +
                 ", roles=" + roles +
                 ", permissions=" + permissions +

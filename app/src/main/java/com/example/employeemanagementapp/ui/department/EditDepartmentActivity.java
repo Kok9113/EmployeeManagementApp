@@ -1,4 +1,4 @@
-package com.example.employeemanagementapp;
+package com.example.employeemanagementapp.ui.department;
 
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -13,13 +13,15 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
-import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.dao.DepartmentDAO;
+import com.example.employeemanagementapp.utils.Constants;
 
 import java.util.Locale;
 
 public class EditDepartmentActivity extends AppCompatActivity {
 
-    private DatabaseHelper dbHelper;
+    private DepartmentDAO departmentDAO;
     private long departmentId;
     private EditText editTextDeptName, editTextDeptPositions;
 
@@ -29,7 +31,7 @@ public class EditDepartmentActivity extends AppCompatActivity {
         applyLanguage();
         setContentView(R.layout.activity_edit_department);
 
-        dbHelper = new DatabaseHelper(this);
+        departmentDAO = new DepartmentDAO(this);
 
         departmentId = getIntent().getLongExtra("departmentId", -1);
         Log.d("EditDepartment", "Received departmentId: " + departmentId);
@@ -64,10 +66,10 @@ public class EditDepartmentActivity extends AppCompatActivity {
     private void loadDepartmentDetails() {
         Cursor cursor = null;
         try {
-            cursor = dbHelper.getDepartmentById(departmentId);
+            cursor = departmentDAO.getDepartmentById(departmentId);
             if (cursor != null && cursor.moveToFirst()) {
-                int nameIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_NAME);
-                int positionsIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_POSITIONS);
+                int nameIndex = cursor.getColumnIndex(Constants.COLUMN_DEPT_NAME);
+                int positionsIndex = cursor.getColumnIndex(Constants.COLUMN_DEPT_POSITIONS);
 
                 if (nameIndex == -1 || positionsIndex == -1) {
                     Log.e("EditDepartment", "Column not found: nameIndex=" + nameIndex + ", positionsIndex=" + positionsIndex);
@@ -107,7 +109,7 @@ public class EditDepartmentActivity extends AppCompatActivity {
             return;
         }
 
-        int rowsAffected = dbHelper.updateDepartment(departmentId, deptName, deptPositions);
+        int rowsAffected = departmentDAO.updateDepartment(departmentId, deptName, deptPositions);
         if (rowsAffected > 0) {
             Toast.makeText(this, R.string.department_updated_success, Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);

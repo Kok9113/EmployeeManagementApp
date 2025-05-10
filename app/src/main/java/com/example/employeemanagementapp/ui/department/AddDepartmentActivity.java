@@ -1,6 +1,5 @@
-package com.example.employeemanagementapp;
+package com.example.employeemanagementapp.ui.department;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -13,7 +12,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
-import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.dao.DepartmentDAO;
 
 import java.util.Locale;
 
@@ -21,7 +21,7 @@ public class AddDepartmentActivity extends AppCompatActivity {
 
     private EditText editTextDeptName, editTextDeptPositions;
     private ImageView imageViewValidate, imageViewBack;
-    private DatabaseHelper databaseHelper;
+    private DepartmentDAO departmentDAO;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,7 @@ public class AddDepartmentActivity extends AppCompatActivity {
         imageViewValidate = findViewById(R.id.image_validate);
         imageViewBack = findViewById(R.id.image_back);
 
-        databaseHelper = new DatabaseHelper(this);
+        departmentDAO = new DepartmentDAO(this);
 
         imageViewBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,7 +60,7 @@ public class AddDepartmentActivity extends AppCompatActivity {
             return;
         }
 
-        long result = databaseHelper.insertDepartment(deptName, deptPositions);
+        long result = departmentDAO.insertDepartment(deptName, deptPositions);
 
         if (result != -1) {
             Toast.makeText(this, R.string.department_added_success, Toast.LENGTH_SHORT).show();

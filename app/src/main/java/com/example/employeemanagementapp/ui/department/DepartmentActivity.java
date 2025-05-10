@@ -1,4 +1,4 @@
-package com.example.employeemanagementapp;
+package com.example.employeemanagementapp.ui.department;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -20,8 +20,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
-import com.example.employeemanagementapp.db.DatabaseHelper;
 import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.dao.DepartmentDAO;
+import com.example.employeemanagementapp.utils.Constants;
 
 import java.util.Locale;
 
@@ -29,10 +30,11 @@ public class DepartmentActivity extends AppCompatActivity {
 
     private static final int ADD_DEPARTMENT_REQUEST_CODE = 2;
 
-    private DatabaseHelper dbHelper;
     private SimpleCursorAdapter listAdapter;
     private EditText searchInput;
     private ListView listView;
+    DepartmentDAO departmentDAO;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +42,7 @@ public class DepartmentActivity extends AppCompatActivity {
         applyLanguage();
         setContentView(R.layout.activity_department);
 
-        dbHelper = new DatabaseHelper(this);
+        departmentDAO = new DepartmentDAO(this);
 
         listView = findViewById(R.id.department_listview);
         searchInput = findViewById(R.id.search_input);
@@ -67,7 +69,7 @@ public class DepartmentActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                @SuppressLint("Range") long departmentId = cursor.getLong(cursor.getColumnIndex(DatabaseHelper.COLUMN_DEPT_ID));
+                @SuppressLint("Range") long departmentId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_DEPT_ID));
                 Intent intent = new Intent(DepartmentActivity.this, DepartmentDetailsActivity.class);
                 intent.putExtra("departmentId", departmentId);
                 startActivityForResult(intent, 1);
@@ -93,14 +95,14 @@ public class DepartmentActivity extends AppCompatActivity {
 
     private void displayDepartments() {
         try {
-            Cursor cursor = dbHelper.getAllDepartments();
+            Cursor cursor = departmentDAO.getAllDepartments();
             if (cursor != null && cursor.moveToFirst()) {
                 if (listAdapter == null) {
                     listAdapter = new SimpleCursorAdapter(
                             this,
                             R.layout.list_item_department,
                             cursor,
-                            new String[]{DatabaseHelper.COLUMN_DEPT_NAME},
+                            new String[]{Constants.COLUMN_DEPT_NAME},
                             new int[]{R.id.text_dept_name},
                             0);
                     listView.setAdapter(listAdapter);
@@ -125,9 +127,9 @@ public class DepartmentActivity extends AppCompatActivity {
         Cursor cursor = null;
         try {
             if (query.isEmpty()) {
-                cursor = dbHelper.getAllDepartments();
+                cursor = departmentDAO.getAllDepartments();
             } else {
-                cursor = dbHelper.searchDepartments(query);
+                cursor = departmentDAO.searchDepartments(query);
             }
 
             if (cursor != null && cursor.moveToFirst()) {

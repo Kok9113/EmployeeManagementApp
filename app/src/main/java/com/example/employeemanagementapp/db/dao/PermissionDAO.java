@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.utils.Constants;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -23,11 +24,11 @@ public class PermissionDAO {
         Set<String> permissions = new HashSet<>();
 
         // 1. Permission từ role
-        String queryRolePerms = "SELECT p.name " +
-                "FROM Permissions p " +
-                "JOIN RolePermissions rp ON p.id = rp.permission_id " +
-                "JOIN UserRoles ur ON rp.role_id = ur.role_id " +
-                "WHERE ur.user_id = ?";
+        String queryRolePerms = "SELECT p." + Constants.COLUMN_PERMISSION_NAME + " " +
+                "FROM " + Constants.TABLE_PERMISSIONS + " p " +
+                "JOIN " + Constants.TABLE_ROLE_PERMISSIONS + " rp ON p." + Constants.COLUMN_PERMISSION_ID + " = rp." + Constants.COLUMN_PERMISSION_IDD + " " +
+                "JOIN " + Constants.TABLE_USER_ROLES + " ur ON rp." + Constants.COLUMN_ROLE_IDD + " = ur." + Constants.COLUMN_ROLE_IDD + " " +
+                "WHERE ur." + Constants.COLUMN_USER_ID + " = ?";
 
         Cursor cursor1 = db.rawQuery(queryRolePerms, new String[]{String.valueOf(userId)});
         if (cursor1 != null && cursor1.moveToFirst()) {
