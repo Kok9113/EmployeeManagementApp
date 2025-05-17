@@ -31,6 +31,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
+import androidx.core.content.ContextCompat;
 
 import com.example.employeemanagementapp.adapter.employee.EmployeeGridAdapter;
 import com.example.employeemanagementapp.db.DatabaseHelper;
@@ -43,6 +44,7 @@ import com.example.employeemanagementapp.db.model.User;
 import com.example.employeemanagementapp.ui.employee.AddEmployeeActivity;
 import com.example.employeemanagementapp.ui.employee.EmployeeDetails;
 import com.example.employeemanagementapp.ui.setting.SettingsActivity;
+import com.example.employeemanagementapp.ui.user.UserActivity;
 import com.example.employeemanagementapp.utils.Constants;
 
 import java.util.ArrayList;
@@ -55,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int ADD_EMPLOYEE_REQUEST_CODE = 1;
 
     private DepartmentDAO departmentDAO;
+    private PermissionDAO permissionDAO; // Thêm biến instance
+    private RoleDAO roleDAO; // Thêm biến instance
     private SimpleCursorAdapter listAdapter;
     private EmployeeGridAdapter gridAdapter;
     private EditText searchInput;
@@ -91,25 +95,32 @@ public class MainActivity extends AppCompatActivity {
         applyLanguage();
         setContentView(R.layout.activity_main);
 
-        // Đăng ký BroadcastReceiver với cờ RECEIVER_NOT_EXPORTED
+        // Đăng ký BroadcastReceiver với ContextCompat
         IntentFilter filter = new IntentFilter("LANGUAGE_CHANGED");
-        registerReceiver(languageChangeReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        ContextCompat.registerReceiver(this, languageChangeReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
         searchInput = findViewById(R.id.search_input);
 
         SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
         int userId = sharedPreferences.getInt("userId", -1);
 
         if (userId != -1) {
-            PermissionDAO permissionDAO = new PermissionDAO(this);
-            List<String> permissions = permissionDAO.getUserPermissions(userId);
-            RoleDAO roleDAO = new RoleDAO(this);
-            List<String> roles = roleDAO.getUserRoles(userId); // tùy dùng hoặc bỏ
+            permissionDAO = new PermissionDAO(this);
+            roleDAO = new RoleDAO(this);
+
+            // Lấy danh sách tên quyền và vai trò
+            List<String> permissionNames = permissionDAO.getUserPermissions(userId);
+            List<String> roleNames = roleDAO.getUserRoles(userId);
+
+            // Chuyển đổi tên thành ID
+            List<Long> permissionIds = permissionNames != null ? permissionDAO.getPermissionIdsByNames(permissionNames) : new ArrayList<>();
+            List<Long> roleIds = roleNames != null ? roleDAO.getRoleIdsByNames(roleNames) : new ArrayList<>();
 
             User user = new User(userId, "");
-            user.setPermissions(permissions);
-            user.setRoles(roles);
+            user.setPermissionIds(permissionIds);
+            user.setRoleIds(roleIds);
 
-            if (user.hasRole("admin")) {
+            // Kiểm tra vai trò admin
+            if (roleDAO.hasRole(userId, "admin")) {
                 searchInput.setVisibility(View.GONE);
             }
         }
@@ -178,16 +189,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        filterDepartmentButton = findViewById(R.id.button_add_department);
-//        if (filterDepartmentButton != null) {
-//            filterDepartmentButton.setOnClickListener(v -> showDepartmentListDialog());
-//        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(languageChangeReceiver); // Hủy đăng ký receiver khi hoạt động bị hủy
+        Log.d("MainActivity", "Unregistering receiver and closing DAOs");
+        unregisterReceiver(languageChangeReceiver);
+        if (permissionDAO != null) {
+            permissionDAO.close();
+        }
+        if (roleDAO != null) {
+            roleDAO.close();
+        }
     }
 
     @Override
@@ -268,6 +282,7 @@ public class MainActivity extends AppCompatActivity {
             headerTitle.setText(getString(R.string.employees_in_department, deptName));
         }
     }
+
     private void showDepartmentListDialog() {
         Cursor cursor = departmentDAO.getAllDepartments();
         ArrayList<String> departmentNames = new ArrayList<>();
@@ -329,6 +344,7 @@ public class MainActivity extends AppCompatActivity {
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
     private void filterEmployeesByDepartment(long deptId) {
         Cursor cursor = null;
         EmployeeDAO employeeDAO = new EmployeeDAO(this);
@@ -360,9 +376,8 @@ public class MainActivity extends AppCompatActivity {
                 noEmployeesText.setVisibility(View.VISIBLE);
             }
         }
-
-
     }
+
     private void loadDepartments() {
         Cursor cursor = departmentDAO.getAllDepartments();
         if (cursor != null && cursor.moveToFirst()) {
@@ -374,6 +389,7 @@ public class MainActivity extends AppCompatActivity {
             cursor.close();
         }
     }
+
     private void displayEmployees() {
         Cursor cursor = null;
         EmployeeDAO employeeDAO = new EmployeeDAO(this);
@@ -451,6 +467,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private void filterEmployeeList(String query) {
         Cursor cursor = null;
         EmployeeDAO employeeDAO = new EmployeeDAO(this);
@@ -483,11 +500,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private void showEmployeeDetails(long employeeId) {
         Intent intent = new Intent(MainActivity.this, EmployeeDetails.class);
         intent.putExtra("employeeId", employeeId);
         startActivity(intent);
     }
+
     public void goToDepartments(View view) {
         Intent intent = new Intent(MainActivity.this, DepartmentActivity.class);
         startActivity(intent);
@@ -500,6 +519,7 @@ public class MainActivity extends AppCompatActivity {
             // Tìm LinearLayout chứa TextView
             LinearLayout departmentsLayout = menuPanel.findViewById(R.id.menu_departments);
             LinearLayout settingsLayout = menuPanel.findViewById(R.id.menu_settings);
+            LinearLayout userLayout = menuPanel.findViewById(R.id.btn_user);
 
             // Tìm TextView bên trong LinearLayout
             if (departmentsLayout != null) {
@@ -514,8 +534,15 @@ public class MainActivity extends AppCompatActivity {
                     settingsText.setText(getString(R.string.menu_settings));
                 }
             }
+            if (userLayout != null) {
+                TextView usersText = userLayout.findViewById(R.id.text_username);
+                if (usersText != null) {
+                    usersText.setText(getString(R.string.menu_user));
+                }
+            }
         }
     }
+
     private void openMenu() {
         menuPanel.setVisibility(View.VISIBLE);
         overlay.setVisibility(View.VISIBLE);
@@ -525,17 +552,24 @@ public class MainActivity extends AppCompatActivity {
         isMenuOpen = true;
         refreshMenu(); // Làm mới menu khi mở
     }
+
     private void closeMenu() {
         overlay.animate().alpha(0f).setDuration(200).withEndAction(() -> overlay.setVisibility(View.GONE)).start();
         menuPanel.animate().translationX(-menuPanel.getWidth()).setDuration(300).withEndAction(() -> menuPanel.setVisibility(View.GONE)).start();
         isMenuOpen = false;
     }
+
     public void GoToSettings(View view) {
         Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
         startActivity(intent);
         closeMenu();
     }
 
+    public void GoToUsers(View view) {
+        Intent intent = new Intent(MainActivity.this, UserActivity.class);
+        startActivity(intent);
+        closeMenu();
+    }
 
     // Language
     private void applyLanguage() {
@@ -555,5 +589,4 @@ public class MainActivity extends AppCompatActivity {
                 getBaseContext().getResources().getDisplayMetrics());
         refreshMenu(); // Làm mới menu sau khi áp dụng ngôn ngữ
     }
-
 }

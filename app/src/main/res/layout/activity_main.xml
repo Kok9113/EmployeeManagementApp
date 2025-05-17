@@ -208,6 +208,29 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/btn_user"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                android:gravity="center_vertical"
+                android:onClick="GoToUsers">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/user"
+                    android:layout_marginEnd="10dp" />
+
+                <TextView
+                    android:id="@+id/text_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/menu_user"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/menu_settings"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -46,6 +46,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".ui.user.UserActivity" android:exported="false" />
+
         <activity
             android:name=".ui.employee.AddEmployeeActivity"
             android:exported="false" />
@@ -69,6 +72,17 @@
             android:exported="false" />
         <activity
             android:name=".ui.department.EditDepartmentActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.example.employeemanagementapp.ui.user.AddUserActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.user.UserDetailsActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.user.EditUserActivity"
             android:exported="false" />
     </application>
 
