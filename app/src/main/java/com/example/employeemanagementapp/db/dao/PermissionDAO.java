@@ -28,13 +28,12 @@ public class PermissionDAO {
         // Truy vấn hợp nhất để lấy quyền từ role_permissions và user_permissions
         String query = "SELECT DISTINCT p." + Constants.COLUMN_PERMISSION_NAME + " " +
                 "FROM " + Constants.TABLE_PERMISSIONS + " p " +
-                "LEFT JOIN " + Constants.TABLE_ROLE_PERMISSIONS + " rp " +
+                "JOIN " + Constants.TABLE_ROLE_PERMISSIONS + " rp " +
                 "ON p." + Constants.COLUMN_PERMISSION_ID + " = rp." + Constants.COLUMN_ROLE_PERMISSION_PERMISSION_ID + " " +
-                "LEFT JOIN " + Constants.TABLE_USER_ROLES + " ur " +
-                "ON rp." + Constants.COLUMN_ROLE_PERMISSION_ROLE_ID + " = ur." + Constants.COLUMN_USER_ROLE_ROLE_ID + " " +
-                "LEFT JOIN " + Constants.TABLE_USER_PERMISSIONS + " up " +
-                "ON p." + Constants.COLUMN_PERMISSION_ID + " = up." + Constants.COLUMN_USER_PERMISSION_PERMISSION_ID + " " +
-                "WHERE ur." + Constants.COLUMN_USER_ROLE_USER_ID + " = ? OR up." + Constants.COLUMN_USER_PERMISSION_USER_ID + " = ?";
+                "JOIN " + Constants.TABLE_USERS + " u " +
+                "ON rp." + Constants.COLUMN_ROLE_PERMISSION_ROLE_ID + " = u." + Constants.COLUMN_USER_ROLE_ID + " " +
+                "WHERE u." + Constants.COLUMN_USER_ID + " = ?";
+
 
         try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), String.valueOf(userId)})) {
             int nameIndex = cursor.getColumnIndex(Constants.COLUMN_PERMISSION_NAME);

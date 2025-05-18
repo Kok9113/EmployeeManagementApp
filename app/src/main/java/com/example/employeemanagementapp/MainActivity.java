@@ -43,6 +43,7 @@ import com.example.employeemanagementapp.db.dao.RoleDAO;
 import com.example.employeemanagementapp.db.model.User;
 import com.example.employeemanagementapp.ui.employee.AddEmployeeActivity;
 import com.example.employeemanagementapp.ui.employee.EmployeeDetails;
+import com.example.employeemanagementapp.ui.role.RoleActivity;
 import com.example.employeemanagementapp.ui.setting.SettingsActivity;
 import com.example.employeemanagementapp.ui.user.UserActivity;
 import com.example.employeemanagementapp.utils.Constants;
@@ -520,6 +521,7 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout departmentsLayout = menuPanel.findViewById(R.id.menu_departments);
             LinearLayout settingsLayout = menuPanel.findViewById(R.id.menu_settings);
             LinearLayout userLayout = menuPanel.findViewById(R.id.btn_user);
+            LinearLayout roleLayout = menuPanel.findViewById(R.id.btn_role);
 
             // Tìm TextView bên trong LinearLayout
             if (departmentsLayout != null) {
@@ -538,6 +540,13 @@ public class MainActivity extends AppCompatActivity {
                 TextView usersText = userLayout.findViewById(R.id.text_username);
                 if (usersText != null) {
                     usersText.setText(getString(R.string.menu_user));
+                }
+            }
+
+            if (roleLayout != null) {
+                TextView roleText = roleLayout.findViewById(R.id.text_role);
+                if (roleText != null) {
+                    roleText.setText(getString(R.string.menu_role));
                 }
             }
         }
@@ -567,6 +576,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void GoToUsers(View view) {
         Intent intent = new Intent(MainActivity.this, UserActivity.class);
+        startActivity(intent);
+        closeMenu();
+    }
+
+    public void GoToRole(View view) {
+        Intent intent = new Intent(MainActivity.this, RoleActivity.class);
         startActivity(intent);
         closeMenu();
     }

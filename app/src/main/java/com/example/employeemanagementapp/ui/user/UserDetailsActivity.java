@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,7 +30,6 @@ public class UserDetailsActivity extends AppCompatActivity {
         textPassword = findViewById(R.id.text_password);
         buttonDelete = findViewById(R.id.button_delete_user);
         buttonEdit = findViewById(R.id.button_edit_user);
-        buttonBack = findViewById(R.id.button_back);
 
         userDAO = new UserDAO(this);
 
@@ -55,7 +55,13 @@ public class UserDetailsActivity extends AppCompatActivity {
             startActivityForResult(intent, EDIT_USER_REQUEST_CODE);
         });
 
-        buttonBack.setOnClickListener(v -> finish());
+        ImageView backIcon = findViewById(R.id.image_back);
+        backIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void displayUserDetails() {

@@ -20,8 +20,8 @@ public class Constants {
     public static final String COLUMN_USER_ID = "user_id";
     public static final String COLUMN_USER_NAME = "username";
     public static final String COLUMN_USER_PASSWORD = "password";
+    public static final String COLUMN_USER_ROLE_ID = "role_id";
 
-    // Cột trong bảng roles
     // Cột trong bảng roles
     public static final String COLUMN_ROLE_ID = "_id";
     public static final String COLUMN_ROLE_NAME = "role_name";
@@ -30,17 +30,10 @@ public class Constants {
     public static final String COLUMN_PERMISSION_ID = "_id";
     public static final String COLUMN_PERMISSION_NAME = "permission_name";
 
-    // Cột trong bảng user_permissions
-    public static final String COLUMN_USER_PERMISSION_USER_ID = "user_id";
-    public static final String COLUMN_USER_PERMISSION_PERMISSION_ID = "permission_id";
-
     // Cột trong bảng role_permissions
     public static final String COLUMN_ROLE_PERMISSION_ROLE_ID = "role_id";
     public static final String COLUMN_ROLE_PERMISSION_PERMISSION_ID = "permission_id";
 
-    // Cột trong bảng user_roles
-    public static final String COLUMN_USER_ROLE_USER_ID = "user_id";
-    public static final String COLUMN_USER_ROLE_ROLE_ID = "role_id";
 
     // Cột trong bảng employees
     public static final String COLUMN_ID = "_id";

@@ -27,7 +27,9 @@
                 android:contentDescription="Back"
                 android:padding="8dp"
                 android:src="@drawable/ic_back"
-                android:onClick="goBack" />
+                android:onClick="goBack"
+                 app:tint="@color/colorIcon"
+                 />
 
             <TextView
                 android:id="@+id/text_employee_list"

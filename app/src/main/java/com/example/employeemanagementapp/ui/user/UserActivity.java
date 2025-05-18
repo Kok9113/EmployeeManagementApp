@@ -63,6 +63,14 @@ public class UserActivity extends AppCompatActivity {
             Intent intent = new Intent(UserActivity.this, AddUserActivity.class);
             startActivityForResult(intent, ADD_USER_REQUEST_CODE);
         });
+
+        ImageView backIcon = findViewById(R.id.image_back);
+        backIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void displayUsers() {

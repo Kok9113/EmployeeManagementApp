@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.db.model.Role;
 import com.example.employeemanagementapp.utils.Constants;
 
 import java.util.ArrayList;
@@ -22,11 +23,12 @@ public class RoleDAO {
 
     public List<String> getUserRoles(int userId) {
         List<String> roles = new ArrayList<>();
+
         String query = "SELECT r." + Constants.COLUMN_ROLE_NAME + " " +
-                "FROM " + Constants.TABLE_ROLES + " r " +
-                "JOIN " + Constants.TABLE_USER_ROLES + " ur " +
-                "ON r." + Constants.COLUMN_ROLE_ID + " = ur." + Constants.COLUMN_USER_ROLE_ROLE_ID + " " +
-                "WHERE ur." + Constants.COLUMN_USER_ROLE_USER_ID + " = ?";
+                "FROM " + Constants.TABLE_USERS + " u " +
+                "JOIN " + Constants.TABLE_ROLES + " r " +
+                "ON u." + Constants.COLUMN_USER_ROLE_ID + " = r." + Constants.COLUMN_ROLE_ID + " " +
+                "WHERE u." + Constants.COLUMN_USER_ID + " = ?";
 
         try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)})) {
             int nameIndex = cursor.getColumnIndex(Constants.COLUMN_ROLE_NAME);
@@ -70,10 +72,10 @@ public class RoleDAO {
     }
 
     public boolean hasRole(int userId, String roleName) {
-        String query = "SELECT 1 FROM " + Constants.TABLE_USER_ROLES + " ur " +
+        String query = "SELECT 1 FROM " + Constants.TABLE_USERS + " u " +
                 "INNER JOIN " + Constants.TABLE_ROLES + " r " +
-                "ON ur." + Constants.COLUMN_USER_ROLE_ROLE_ID + " = r." + Constants.COLUMN_ROLE_ID + " " +
-                "WHERE ur." + Constants.COLUMN_USER_ROLE_USER_ID + " = ? AND r." + Constants.COLUMN_ROLE_NAME + " = ?";
+                "ON u." + Constants.COLUMN_USER_ROLE_ID + " = r." + Constants.COLUMN_ROLE_ID + " " +
+                "WHERE u." + Constants.COLUMN_USER_ID + " = ? AND r." + Constants.COLUMN_ROLE_NAME + " = ?";
 
         try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), roleName})) {
             return cursor.moveToFirst();
@@ -82,11 +84,92 @@ public class RoleDAO {
             return false;
         }
     }
+    public List<Role> getAllRoles() {
+        List<Role> roleList = new ArrayList<>();
+        SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT " + Constants.COLUMN_ROLE_ID + ", " +
+                        Constants.COLUMN_ROLE_NAME +
+                        " FROM " + Constants.TABLE_ROLES,
+                null
+        );
+
+        if (cursor.moveToFirst()) {
+            do {
+                int id = cursor.getInt(0);
+                String name = cursor.getString(1);
+                roleList.add(new Role(id, name));
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return roleList;
+    }
+    public Cursor getAllRolesCursor() {
+        SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+        return db.rawQuery(
+                "SELECT " + Constants.COLUMN_ROLE_ID + " AS _id, " +  // BẮT BUỘC phải có _id cho SimpleCursorAdapter
+                        Constants.COLUMN_ROLE_NAME +
+                        " FROM " + Constants.TABLE_ROLES,
+                null
+        );
+    }
+    public Role getRoleById(int roleId) {
+        Role role = null;
+
+        String query = "SELECT " + Constants.COLUMN_ROLE_ID + ", " + Constants.COLUMN_ROLE_NAME +
+                " FROM " + Constants.TABLE_ROLES +
+                " WHERE " + Constants.COLUMN_ROLE_ID + " = ?";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(roleId)})) {
+            if (cursor.moveToFirst()) {
+                int idIndex = cursor.getColumnIndex(Constants.COLUMN_ROLE_ID);
+                int nameIndex = cursor.getColumnIndex(Constants.COLUMN_ROLE_NAME);
+
+                if (idIndex >= 0 && nameIndex >= 0) {
+                    int id = cursor.getInt(idIndex);
+                    String name = cursor.getString(nameIndex);
+                    role = new Role(id, name);
+                } else {
+                    android.util.Log.e("RoleDAO", "Cột trong cursor không tồn tại");
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("RoleDAO", "Lỗi khi lấy Role theo ID: " + e.getMessage());
+        }
+
+        return role;
+    }
+    public long insertRole(String roleName) {
+        long result = -1;
+
+        String query = "INSERT INTO " + Constants.TABLE_ROLES + " (" + Constants.COLUMN_ROLE_NAME + ") VALUES (?)";
+
+        try {
+            db.beginTransaction();
+            db.execSQL(query, new Object[]{roleName});
+            Cursor cursor = db.rawQuery("SELECT last_insert_rowid()", null);
+            if (cursor.moveToFirst()) {
+                result = cursor.getLong(0);  // Trả về ID của role vừa tạo
+            }
+            cursor.close();
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            android.util.Log.e("RoleDAO", "Lỗi khi tạo role: " + e.getMessage());
+        } finally {
+            db.endTransaction();
+        }
+
+        return result;
+    }
 
     public void close() {
         if (db != null && db.isOpen()) {
             db.close();
+            db = null;
         }
-        dbHelper.close();
+        if (dbHelper != null) {
+            dbHelper.close();
+        }
     }
 }

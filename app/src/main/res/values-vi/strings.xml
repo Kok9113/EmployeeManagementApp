@@ -18,6 +18,8 @@
     <string name="menu_title">Menu</string>
     <string name="menu_departments">Phòng ban</string>
     <string name="menu_settings">Cài đặt</string>
+    <string name="menu_user">Người dùng</string>
+    <string name="menu_role">Role</string>
 
     <!-- Details -->
     <string name="DetailsTitle">Thông tin</string>
@@ -94,4 +96,18 @@
     <string name="all_departments">Tất cả phòng ban</string>
     <string name="selected">Đã chọn</string>
     <string name="employees_in_department">Nhân viên trong %1$s</string>
+
+    <!--User-->
+    <string name="user_list">Danh sách người dùng</string>
+    <string name="user_detail">Chi tiết người dùng</string>
+    <string name="edit_user">Sửa người dùng</string>
+
+    <!--Role-->
+    <string name="role_list">Danh sách vai trò</string>
+    <string name="role_detail">Chi tiết vai trò</string>
+    <string name="role_add">Thêm vai trò</string>
+    <string name="role_name">Tên vai trò</string>
+    <string name="select_role">Chọn vai trò</string>
+    <string name="choose_permission_for_role">Chọn quyền cho role</string>
+
 </resources>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
@@ -18,49 +18,55 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="false"
         android:theme="@style/Theme.EmployeeManagementApp"
-        tools:targetApi="31" >
-
+        tools:targetApi="31">
+        <activity
+            android:name=".ui.role.AddRoleActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.role.RoleActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.user.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.user.RegisterActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.setting.SettingsActivity"
             android:exported="false"
             android:label="@string/title_activity_settings" />
         <activity
             android:name=".ui.employee.EmployeeDetails"
-            android:exported="false" >
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.SENDTO" />
+
                 <data android:scheme="mailto" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".ui.user.UserActivity" android:exported="false" />
-
+        <activity
+            android:name=".ui.user.UserActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.employee.AddEmployeeActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <!-- Thêm các activity mới cho quản lý phòng ban -->
+        </activity> <!-- Thêm các activity mới cho quản lý phòng ban -->
         <activity
             android:name=".ui.department.DepartmentActivity"
             android:exported="false" />
@@ -74,13 +80,11 @@
             android:name=".ui.department.EditDepartmentActivity"
             android:exported="false" />
         <activity
-            android:name="com.example.employeemanagementapp.ui.user.AddUserActivity"
+            android:name=".ui.user.AddUserActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.user.UserDetailsActivity"
             android:exported="false" />
-
         <activity
             android:name=".ui.user.EditUserActivity"
             android:exported="false" />

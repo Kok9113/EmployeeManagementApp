@@ -135,10 +135,10 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_gravity="end"
-            android:layout_margin="20dp"
+            android:layout_margin="30dp"
+            android:background="@drawable/rounded_button_background"
             android:text="+"
-            android:textSize="25sp"
-            android:background="@drawable/rounded_button_background" />
+            android:textSize="25sp" />
     </LinearLayout>
 
     <!-- Overlay -->
@@ -156,12 +156,12 @@
         android:id="@+id/menu_panel"
         android:layout_width="300dp"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@android:color/white"
-        android:visibility="gone"
-        android:translationX="-300dp"
         android:layout_gravity="start"
-        android:elevation="10dp">
+        android:background="@android:color/white"
+        android:elevation="10dp"
+        android:orientation="vertical"
+        android:translationX="-300dp"
+        android:visibility="visible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -172,32 +172,34 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="@string/menu_title"
                 android:textColor="@android:color/white"
-                android:textSize="20sp"
-                android:gravity="center" />
+                android:textSize="20sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="10dp"
+            >
 
             <LinearLayout
                 android:id="@+id/menu_departments"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp"
                 android:gravity="center_vertical"
-                android:onClick="goToDepartments">
+                android:onClick="goToDepartments"
+                android:orientation="horizontal"
+                android:padding="8dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
                     android:src="@drawable/ic_department"
-                    android:layout_marginEnd="10dp" />
+                    app:tint="@color/colorMenuIcon"/>
 
                 <TextView
                     android:id="@+id/text_department"
@@ -211,16 +213,17 @@
                 android:id="@+id/btn_user"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp"
                 android:gravity="center_vertical"
-                android:onClick="GoToUsers">
+                android:onClick="GoToUsers"
+                android:orientation="horizontal"
+                android:padding="8dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/user"
-                    android:layout_marginEnd="10dp" />
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/ic_user"
+                    app:tint="@color/colorMenuIcon"/>
 
                 <TextView
                     android:id="@+id/text_username"
@@ -231,19 +234,44 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/menu_settings"
+                android:id="@+id/btn_role"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp"
                 android:gravity="center_vertical"
-                android:onClick="GoToSettings">
+                android:onClick="GoToRole"
+                android:orientation="horizontal"
+                android:padding="8dp">
 
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/settings"
-                    android:layout_marginEnd="10dp" />
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/role"
+                    app:tint="@color/colorMenuIcon"/>
+
+                <TextView
+                    android:id="@+id/text_role"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/menu_user"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/menu_settings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:onClick="GoToSettings"
+                android:orientation="horizontal"
+                android:padding="8dp">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/settings_24px"
+                    app:tint="@color/colorMenuIcon"/>
 
                 <TextView
                     android:id="@+id/text_settings"

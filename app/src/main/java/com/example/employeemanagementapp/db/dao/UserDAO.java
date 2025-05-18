@@ -14,11 +14,12 @@ import java.util.List;
 
 public class UserDAO {
 
-    private final SQLiteDatabase db;
+    private SQLiteDatabase db;
+    private final DatabaseHelper dbHelper;
 
     public UserDAO(Context context) {
-        DatabaseHelper helper = new DatabaseHelper(context);
-        db = helper.getWritableDatabase();
+        dbHelper = new DatabaseHelper(context);
+        db = dbHelper.getWritableDatabase();
     }
 
     // Lấy tất cả người dùng
@@ -93,43 +94,7 @@ public class UserDAO {
 
         long userId = db.insert(Constants.TABLE_USERS, null, values);
 
-        if (userId != -1) {
-            addUserRoles(userId, user.getRoleIds());
-            addUserPermissions(userId, user.getPermissionIds());
-        }
         return userId;
-    }
-
-    private void addUserRoles(long userId, List<Long> roleIds) {
-        for (Long roleId : roleIds) {
-            Cursor cursor = db.query(Constants.TABLE_USER_ROLES, null,
-                    Constants.COLUMN_USER_ROLE_USER_ID + " = ? AND " + Constants.COLUMN_USER_ROLE_ROLE_ID + " = ?",
-                    new String[]{String.valueOf(userId), String.valueOf(roleId)}, null, null, null);
-
-            if (cursor.getCount() == 0) {
-                ContentValues values = new ContentValues();
-                values.put(Constants.COLUMN_USER_ROLE_USER_ID, userId);
-                values.put(Constants.COLUMN_USER_ROLE_ROLE_ID, roleId);
-                db.insert(Constants.TABLE_USER_ROLES, null, values);
-            }
-            cursor.close();
-        }
-    }
-
-    private void addUserPermissions(long userId, List<Long> permissionIds) {
-        for (Long permissionId : permissionIds) {
-            Cursor cursor = db.query(Constants.TABLE_USER_PERMISSIONS, null,
-                    Constants.COLUMN_USER_PERMISSION_USER_ID + " = ? AND " + Constants.COLUMN_USER_PERMISSION_PERMISSION_ID + " = ?",
-                    new String[]{String.valueOf(userId), String.valueOf(permissionId)}, null, null, null);
-
-            if (cursor.getCount() == 0) {
-                ContentValues values = new ContentValues();
-                values.put(Constants.COLUMN_USER_PERMISSION_USER_ID, userId);
-                values.put(Constants.COLUMN_USER_PERMISSION_PERMISSION_ID, permissionId);
-                db.insert(Constants.TABLE_USER_PERMISSIONS, null, values);
-            }
-            cursor.close();
-        }
     }
 
     public int updateUser(User user) {
@@ -158,44 +123,35 @@ public class UserDAO {
     }
 
     public void deleteUser(long userId) {
-        db.delete(Constants.TABLE_USER_ROLES, Constants.COLUMN_USER_ROLE_USER_ID + " = ?", new String[]{String.valueOf(userId)});
-        db.delete(Constants.TABLE_USER_PERMISSIONS, Constants.COLUMN_USER_PERMISSION_USER_ID + " = ?", new String[]{String.valueOf(userId)});
         db.delete(Constants.TABLE_USERS, Constants.COLUMN_USER_ID + " = ?", new String[]{String.valueOf(userId)});
     }
 
-    public List<Long> getUserRoles(long userId) {
-        List<Long> roles = new ArrayList<>();
-        String query = "SELECT " + Constants.COLUMN_USER_ROLE_ROLE_ID + " FROM " + Constants.TABLE_USER_ROLES +
-                " WHERE " + Constants.COLUMN_USER_ROLE_USER_ID + " = ?";
+    public int getUserRole(int userId) {
+        String query = "SELECT " + Constants.COLUMN_USER_ROLE_ID +
+                " FROM " + Constants.TABLE_USER_ROLES +
+                " WHERE " + Constants.COLUMN_USER_ID + " = ? LIMIT 1";
+
         try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)})) {
-            int roleIdIndex = cursor.getColumnIndex(Constants.COLUMN_USER_ROLE_ROLE_ID);
+            int roleIdIndex = cursor.getColumnIndex(Constants.COLUMN_USER_ROLE_ID);
             if (roleIdIndex >= 0 && cursor.moveToFirst()) {
-                do {
-                    long roleId = cursor.getLong(roleIdIndex);
-                    roles.add(roleId);
-                } while (cursor.moveToNext());
+                return cursor.getInt(roleIdIndex); // dùng getInt thay vì getLong
             } else if (roleIdIndex < 0) {
-                android.util.Log.e("UserDAO", "Cột " + Constants.COLUMN_USER_ROLE_ROLE_ID + " không tồn tại trong truy vấn");
+                android.util.Log.e("UserDAO", "Cột " + Constants.COLUMN_USER_ROLE_ID + " không tồn tại trong truy vấn");
             }
+        } catch (Exception e) {
+            android.util.Log.e("UserDAO", "Lỗi khi lấy vai trò người dùng", e);
         }
-        return roles;
+
+        return -1; // Trả về -1 để biểu thị không tìm thấy role (hoặc bạn chọn giá trị mặc định khác)
     }
 
-    public List<Long> getUserPermissions(long userId) {
-        List<Long> permissions = new ArrayList<>();
-        String query = "SELECT " + Constants.COLUMN_USER_PERMISSION_PERMISSION_ID + " FROM " + Constants.TABLE_USER_PERMISSIONS +
-                " WHERE " + Constants.COLUMN_USER_PERMISSION_USER_ID + " = ?";
-        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)})) {
-            int permissionIdIndex = cursor.getColumnIndex(Constants.COLUMN_USER_PERMISSION_PERMISSION_ID);
-            if (permissionIdIndex >= 0 && cursor.moveToFirst()) {
-                do {
-                    long permissionId = cursor.getLong(permissionIdIndex);
-                    permissions.add(permissionId);
-                } while (cursor.moveToNext());
-            } else if (permissionIdIndex < 0) {
-                android.util.Log.e("UserDAO", "Cột " + Constants.COLUMN_USER_PERMISSION_PERMISSION_ID + " không tồn tại trong truy vấn");
-            }
+    public void close() {
+        if (db != null && db.isOpen()) {
+            db.close();
+            db = null;
         }
-        return permissions;
+        if (dbHelper != null) {
+            dbHelper.close();
+        }
     }
 }

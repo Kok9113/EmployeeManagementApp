@@ -19,10 +19,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Constants.COLUMN_DEPT_POSITIONS + " TEXT)";
 
     private static final String TABLE_CREATE_USERS =
-            "CREATE TABLE " + Constants.TABLE_USERS + " (" +
-                    Constants.COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    Constants.COLUMN_USER_NAME + " TEXT UNIQUE, " +
-                    Constants.COLUMN_USER_PASSWORD + " TEXT)";
+    "CREATE TABLE " + Constants.TABLE_USERS + " (" +
+        Constants.COLUMN_USER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+        Constants.COLUMN_USER_NAME + " TEXT UNIQUE, " +
+        Constants.COLUMN_USER_PASSWORD + " TEXT, " +
+        Constants.COLUMN_USER_ROLE_ID + " INTEGER, " +
+        "FOREIGN KEY(" + Constants.COLUMN_USER_ROLE_ID + ") REFERENCES " + Constants.TABLE_ROLES + "(" + Constants.COLUMN_ROLE_ID + "))";
 
     private static final String TABLE_CREATE_ROLES =
             "CREATE TABLE " + Constants.TABLE_ROLES + " (" +
@@ -34,14 +36,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Constants.COLUMN_PERMISSION_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     Constants.COLUMN_PERMISSION_NAME + " TEXT NOT NULL)";
 
-    private static final String TABLE_CREATE_USER_ROLES =
-            "CREATE TABLE " + Constants.TABLE_USER_ROLES + " (" +
-                    Constants.COLUMN_USER_ROLE_USER_ID + " INTEGER NOT NULL, " +
-                    Constants.COLUMN_USER_ROLE_ROLE_ID + " INTEGER NOT NULL, " +
-                    "FOREIGN KEY(" + Constants.COLUMN_USER_ROLE_USER_ID + ") REFERENCES " + Constants.TABLE_USERS + "(" + Constants.COLUMN_USER_ID + "), " +
-                    "FOREIGN KEY(" + Constants.COLUMN_USER_ROLE_ROLE_ID + ") REFERENCES " + Constants.TABLE_ROLES + "(" + Constants.COLUMN_ROLE_ID + "), " +
-                    "PRIMARY KEY(" + Constants.COLUMN_USER_ROLE_USER_ID + ", " + Constants.COLUMN_USER_ROLE_ROLE_ID + "))";
-
     private static final String TABLE_CREATE_ROLE_PERMISSIONS =
             "CREATE TABLE " + Constants.TABLE_ROLE_PERMISSIONS + " (" +
                     Constants.COLUMN_ROLE_PERMISSION_ROLE_ID + " INTEGER NOT NULL, " +
@@ -50,14 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     "FOREIGN KEY(" + Constants.COLUMN_ROLE_PERMISSION_PERMISSION_ID + ") REFERENCES " + Constants.TABLE_PERMISSIONS + "(" + Constants.COLUMN_PERMISSION_ID + "), " +
                     "PRIMARY KEY(" + Constants.COLUMN_ROLE_PERMISSION_ROLE_ID + ", " + Constants.COLUMN_ROLE_PERMISSION_PERMISSION_ID + "))";
 
-    private static final String TABLE_CREATE_USER_PERMISSIONS =
-            "CREATE TABLE " + Constants.TABLE_USER_PERMISSIONS + " (" +
-                    Constants.COLUMN_USER_PERMISSION_USER_ID + " INTEGER NOT NULL, " +
-                    Constants.COLUMN_USER_PERMISSION_PERMISSION_ID + " INTEGER NOT NULL, " +
-                    "FOREIGN KEY(" + Constants.COLUMN_USER_PERMISSION_USER_ID + ") REFERENCES " + Constants.TABLE_USERS + "(" + Constants.COLUMN_USER_ID + "), " +
-                    "FOREIGN KEY(" + Constants.COLUMN_USER_PERMISSION_PERMISSION_ID + ") REFERENCES " + Constants.TABLE_PERMISSIONS + "(" + Constants.COLUMN_PERMISSION_ID + "), " +
-                    "PRIMARY KEY(" + Constants.COLUMN_USER_PERMISSION_USER_ID + ", " + Constants.COLUMN_USER_PERMISSION_PERMISSION_ID + "))";
-
+    
     private static final String TABLE_CREATE_EMPLOYEES =
             "CREATE TABLE " + Constants.TABLE_EMPLOYEE + " (" +
                     Constants.COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -82,9 +69,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(TABLE_CREATE_USERS);
         db.execSQL(TABLE_CREATE_ROLES);
         db.execSQL(TABLE_CREATE_PERMISSIONS);
-        db.execSQL(TABLE_CREATE_USER_ROLES);
         db.execSQL(TABLE_CREATE_ROLE_PERMISSIONS);
-        db.execSQL(TABLE_CREATE_USER_PERMISSIONS);
         db.execSQL(TABLE_CREATE_EMPLOYEES);
     }
 
@@ -93,9 +78,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (oldVersion < 9) {
             db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_EMPLOYEE);
             db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_DEPARTMENTS);
-            db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_USER_ROLES);
             db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_ROLE_PERMISSIONS);
-            db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_USER_PERMISSIONS);
             db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_USERS);
             db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_ROLES);
             db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_PERMISSIONS);

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -25,7 +26,8 @@
                 android:layout_gravity="center_vertical"
                 android:contentDescription="@string/back_icon"
                 android:padding="8dp"
-                android:src="@drawable/ic_back" />
+                android:src="@drawable/ic_back"
+                 app:tint="@color/colorIcon"/>
 
             <TextView
                 android:id="@+id/text_department_title"

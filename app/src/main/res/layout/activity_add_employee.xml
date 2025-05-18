@@ -26,7 +26,8 @@
                 android:layout_gravity="center_vertical"
                 android:contentDescription="Back"
                 android:padding="8dp"
-                android:src="@drawable/ic_back" />
+                android:src="@drawable/ic_back"
+                app:tint="@color/colorIcon" />
 
             <TextView
                 android:id="@+id/text_employee_list"

@@ -3,17 +3,26 @@ package com.example.employeemanagementapp.ui.user;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.dao.RoleDAO;
 import com.example.employeemanagementapp.db.dao.UserDAO;
+import com.example.employeemanagementapp.db.model.Role;
 import com.example.employeemanagementapp.db.model.User;
+
+import java.util.List;
 
 public class EditUserActivity extends AppCompatActivity {
 
     private EditText edtUsername, edtPassword;
+    private Spinner spinnerRole;
     private UserDAO userDAO;
+    private RoleDAO roleDAO;
     private int userId;
 
     @Override
@@ -36,10 +45,41 @@ public class EditUserActivity extends AppCompatActivity {
             return;
         }
 
+
+
+        spinnerRole = findViewById(R.id.spinnerRole);
+
+        roleDAO = new RoleDAO(this);
+        List<Role> roles = roleDAO.getAllRoles();
+
+        // Adapter với dữ liệu từ SQLite
+        ArrayAdapter<Role> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item,
+                roles
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerRole.setAdapter(adapter);
+
         // Tải dữ liệu người dùng và điền vào EditText
         loadUserData(userId);
+
+        ImageView backIcon = findViewById(R.id.image_back);
+        backIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (userDAO != null) {
+            userDAO.close();
+        }
+    }
     // Hàm tải thông tin người dùng vào EditText
     private void loadUserData(int userId) {
         User user = userDAO.getUserById(userId);
@@ -47,6 +87,23 @@ public class EditUserActivity extends AppCompatActivity {
         if (user != null) {
             edtUsername.setText(user.getUsername());
             edtPassword.setText(user.getPassword());
+            int roleId = userDAO.getUserRole(userId); // hoặc user.getRoleId() nếu đã gán
+
+            // Lấy Role từ roleId
+            Role role = roleDAO.getRoleById(roleId);
+
+            if (role != null) {
+                String userRoleName = role.getName();
+
+                // Tìm và set vị trí spinner theo tên role
+                ArrayAdapter<String> adapter = (ArrayAdapter<String>) spinnerRole.getAdapter();
+                if (adapter != null) {
+                    int spinnerPosition = adapter.getPosition(userRoleName);
+                    if (spinnerPosition >= 0) {
+                        spinnerRole.setSelection(spinnerPosition);
+                    }
+                }
+            }
         } else {
             Toast.makeText(this, "Không tìm thấy người dùng", Toast.LENGTH_SHORT).show();
             finish();
