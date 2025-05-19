@@ -12,6 +12,7 @@ public class Employee {
     private String gender; // Thêm trường giới tính
     private String hireDate; // Thêm trường ngày vào làm
     private double salary; // Thêm trường mức lương
+    private byte[] image;
 
     public Employee() {
     }
@@ -118,4 +119,13 @@ public class Employee {
     public void setSalary(double salary) {
         this.salary = salary;
     }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
 }
