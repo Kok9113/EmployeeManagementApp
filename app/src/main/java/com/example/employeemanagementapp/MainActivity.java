@@ -43,6 +43,7 @@ import com.example.employeemanagementapp.db.dao.RoleDAO;
 import com.example.employeemanagementapp.db.model.User;
 import com.example.employeemanagementapp.ui.employee.AddEmployeeActivity;
 import com.example.employeemanagementapp.ui.employee.EmployeeDetails;
+import com.example.employeemanagementapp.ui.permission.PermissionActivity;
 import com.example.employeemanagementapp.ui.role.RoleActivity;
 import com.example.employeemanagementapp.ui.setting.SettingsActivity;
 import com.example.employeemanagementapp.ui.user.UserActivity;
@@ -582,6 +583,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void GoToRole(View view) {
         Intent intent = new Intent(MainActivity.this, RoleActivity.class);
+        startActivity(intent);
+        closeMenu();
+    }
+
+    public void GoToPermission(View view) {
+        Intent intent = new Intent(MainActivity.this, PermissionActivity.class);
         startActivity(intent);
         closeMenu();
     }

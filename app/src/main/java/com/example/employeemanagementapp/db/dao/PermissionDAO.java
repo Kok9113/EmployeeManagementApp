@@ -76,6 +76,99 @@ public class PermissionDAO {
         return permissionIds;
     }
 
+    public Cursor getAllPermissionsCursor() {
+        String query = "SELECT " + Constants.COLUMN_PERMISSION_ID + ", " + Constants.COLUMN_PERMISSION_NAME +
+                " FROM " + Constants.TABLE_PERMISSIONS;
+        return db.rawQuery(query, null);
+    }
+
+    public long insertPermission(String permissionName) {
+        long newRowId = -1;
+
+        if (permissionName == null || permissionName.trim().isEmpty()) {
+            android.util.Log.e("PermissionDAO", "Tên permission không được để trống");
+            return newRowId;
+        }
+
+        // Kiểm tra xem permission đã tồn tại chưa
+        String checkQuery = "SELECT " + Constants.COLUMN_PERMISSION_ID +
+                " FROM " + Constants.TABLE_PERMISSIONS +
+                " WHERE " + Constants.COLUMN_PERMISSION_NAME + " = ?";
+        try (Cursor cursor = db.rawQuery(checkQuery, new String[]{permissionName})) {
+            if (cursor.moveToFirst()) {
+                android.util.Log.i("PermissionDAO", "Permission đã tồn tại: " + permissionName);
+                return -1; // đã tồn tại
+            }
+        } catch (Exception e) {
+            android.util.Log.e("PermissionDAO", "Lỗi khi kiểm tra permission: " + e.getMessage());
+            return -1;
+        }
+
+        // Nếu chưa tồn tại thì thêm mới
+        String insertQuery = "INSERT INTO " + Constants.TABLE_PERMISSIONS + " (" +
+                Constants.COLUMN_PERMISSION_NAME + ") VALUES (?)";
+        try {
+            db.execSQL(insertQuery, new Object[]{permissionName});
+            // Lấy ID vừa insert
+            String lastIdQuery = "SELECT last_insert_rowid()";
+            try (Cursor cursor = db.rawQuery(lastIdQuery, null)) {
+                if (cursor.moveToFirst()) {
+                    newRowId = cursor.getLong(0);
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("PermissionDAO", "Lỗi khi thêm permission: " + e.getMessage());
+        }
+
+        return newRowId;
+    }
+
+    public Cursor getPermissionCursorById(long permissionId) {
+        String query = "SELECT " + Constants.COLUMN_PERMISSION_ID + ", " + Constants.COLUMN_PERMISSION_NAME +
+                " FROM " + Constants.TABLE_PERMISSIONS +
+                " WHERE " + Constants.COLUMN_PERMISSION_ID + " = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(permissionId)});
+    }
+
+    public int updatePermission(long permissionId, String newPermissionName) {
+        if (newPermissionName == null || newPermissionName.trim().isEmpty()) {
+            android.util.Log.e("PermissionDAO", "Tên permission không được để trống");
+            return 0;
+        }
+
+        android.content.ContentValues values = new android.content.ContentValues();
+        values.put(Constants.COLUMN_PERMISSION_NAME, newPermissionName);
+
+        int rowsAffected = 0;
+        try {
+            rowsAffected = db.update(
+                    Constants.TABLE_PERMISSIONS,
+                    values,
+                    Constants.COLUMN_PERMISSION_ID + " = ?",
+                    new String[]{String.valueOf(permissionId)}
+            );
+        } catch (Exception e) {
+            android.util.Log.e("PermissionDAO", "Lỗi khi cập nhật permission: " + e.getMessage());
+        }
+
+        return rowsAffected;
+    }
+
+    public int deletePermission(long permissionId) {
+        int rowsDeleted = 0;
+        try {
+            rowsDeleted = db.delete(
+                    Constants.TABLE_PERMISSIONS,
+                    Constants.COLUMN_PERMISSION_ID + " = ?",
+                    new String[]{String.valueOf(permissionId)}
+            );
+        } catch (Exception e) {
+            android.util.Log.e("PermissionDAO", "Lỗi khi xóa permission: " + e.getMessage());
+        }
+
+        return rowsDeleted;
+    }
+
     public void close() {
         if (db != null && db.isOpen()) {
             db.close();

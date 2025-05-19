@@ -20,6 +20,8 @@
     <string name="menu_settings">Cài đặt</string>
     <string name="menu_user">Người dùng</string>
     <string name="menu_role">Role</string>
+    <string name="menu_permission">Permission</string>
+
 
     <!-- Details -->
     <string name="DetailsTitle">Thông tin</string>
@@ -109,5 +111,24 @@
     <string name="role_name">Tên vai trò</string>
     <string name="select_role">Chọn vai trò</string>
     <string name="choose_permission_for_role">Chọn quyền cho role</string>
+
+    <!-- Permission -->
+    <string name="permission_list">Danh sách quyền</string>
+    <string name="add_permission_title">Thêm quyền</string>
+    <string name="permission_name_title">Tên quyền</string>
+    <string name="per_name_hint">Nhập tên quyền</string>
+    <string name="edit_per">Sửa quyền</string>
+    <string name="per_details">Chi tiết quyền</string>
+
+
+
+    <!-- Mess -->
+    <string name="added_success">Thêm thành công</string>
+    <string name="added_failed">Failed to add</string>
+    <string name="invalid_id">ID không hợp lệ</string>
+    <string name="not_found">Không tìm thấy</string>
+    <string name="delete_message">Bạn có chắc chắn muốn xóa không?</string>
+    <string name="deleted_success">Xóa thành công</string>
+    <string name="deleted_failed">Xóa thất bại</string>
 
 </resources>
