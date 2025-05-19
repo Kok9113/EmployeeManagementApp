@@ -1,6 +1,7 @@
 package com.example.employeemanagementapp.ui.employee;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -30,13 +31,15 @@ import com.example.employeemanagementapp.utils.Constants;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 public class AddEmployeeActivity extends AppCompatActivity {
 
     private EditText editTextFirstName, editTextLastName, editTextPhoneNumber, editTextEmail, editTextResidence;
-    private Spinner spinnerDepartment, spinnerPosition;
+    private Spinner spinnerDepartment, spinnerPosition, spinnerGender;
+    private EditText editTextHireDate, editTextSalary;
     private ImageView imageViewValidate, imageViewBack, imageView;
     private EmployeeDAO employeeDAO;
     private DepartmentDAO departmentDAO;
@@ -76,6 +79,15 @@ public class AddEmployeeActivity extends AppCompatActivity {
         employeeDAO = new EmployeeDAO(this);
         departmentDAO = new DepartmentDAO(this);
 
+        // Thiết lập Spinner giới tính
+        ArrayAdapter<CharSequence> genderAdapter = ArrayAdapter.createFromResource(
+                this, R.array.gender_options, android.R.layout.simple_spinner_item);
+        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerGender.setAdapter(genderAdapter);
+
+        // Thiết lập DatePicker cho ngày vào làm
+        editTextHireDate.setOnClickListener(v -> showDatePickerDialog());
+
         loadDepartments();
 
         imageViewBack.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +117,22 @@ public class AddEmployeeActivity extends AppCompatActivity {
                 updatePositionSpinner(new String[]{});
             }
         });
+    }
+
+    private void showDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    String formattedDate = String.format(Locale.US, "%d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay);
+                    editTextHireDate.setText(formattedDate);
+                },
+                year, month, day);
+        datePickerDialog.show();
     }
 
     private void loadDepartments() {
@@ -205,9 +233,14 @@ public class AddEmployeeActivity extends AppCompatActivity {
         String email = editTextEmail.getText().toString().trim();
         String residence = editTextResidence.getText().toString().trim();
         String position = spinnerPosition.getSelectedItem() != null ? spinnerPosition.getSelectedItem().toString() : "";
+        String gender = spinnerGender.getSelectedItem() != null ? spinnerGender.getSelectedItem().toString() : "";
+        String hireDate = editTextHireDate.getText().toString().trim();
+        String salaryStr = editTextSalary.getText().toString().trim();
         byte[] imageBytes = convertImageToByteArray();
 
-        if (firstName.isEmpty() || lastName.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() || residence.isEmpty() || selectedDepartmentId == -1 || position.isEmpty()) {
+        if (firstName.isEmpty() || lastName.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() ||
+                residence.isEmpty() || selectedDepartmentId == -1 || position.isEmpty() ||
+                gender.isEmpty() || hireDate.isEmpty() || salaryStr.isEmpty()) {
             Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -215,8 +248,16 @@ public class AddEmployeeActivity extends AppCompatActivity {
             Toast.makeText(this, "Failed to process profile image", Toast.LENGTH_SHORT).show();
             return;
         }
+        double salary;
+        try {
+            salary = Double.parseDouble(salaryStr);
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Mức lương không hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        Employee employee = new Employee(firstName, lastName, phoneNumber, email, selectedDepartmentId, position, residence);
+        Employee employee = new Employee(firstName, lastName, phoneNumber, email, selectedDepartmentId,
+                position, residence, gender, hireDate, salary);
         long result = employeeDAO.insertEmployee(employee, imageBytes);
 
         if (result != -1) {

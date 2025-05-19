@@ -69,6 +69,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     Constants.COLUMN_RESIDENCE + " TEXT, " +
                     Constants.COLUMN_POSITION + " TEXT, " +
                     Constants.COLUMN_DEPARTMENT_ID + " INTEGER, " +
+                    Constants.COLUMN_GENDER + " TEXT, " + // Thêm cột giới tính
+                    Constants.COLUMN_HIRE_DATE + " TEXT, " + // Thêm cột ngày vào làm
+                    Constants.COLUMN_SALARY + " REAL, " + // Thêm cột mức lương
                     "FOREIGN KEY(" + Constants.COLUMN_DEPARTMENT_ID + ") REFERENCES " + Constants.TABLE_DEPARTMENTS + "(" + Constants.COLUMN_DEPT_ID + ")" +
                     ")";
 

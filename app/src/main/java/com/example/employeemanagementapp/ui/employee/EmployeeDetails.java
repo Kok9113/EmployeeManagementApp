@@ -1,6 +1,7 @@
 package com.example.employeemanagementapp.ui.employee;
 
 import android.annotation.SuppressLint;
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -35,6 +36,7 @@ import com.example.employeemanagementapp.utils.Constants;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,7 +47,8 @@ public class EmployeeDetails extends AppCompatActivity {
     private boolean isEditMode = false;
     private ImageView profileImageView;
     private EditText editTextFirstName, editTextLastName, editTextPhoneNumber, editTextEmail, editTextResidence;
-    private Spinner spinnerDepartment, spinnerPosition;
+    private EditText editTextHireDate, editTextSalary;
+    private Spinner spinnerDepartment, spinnerPosition, spinnerGender;
     private List<Department> departments;
     private long selectedDepartmentId;
 
@@ -75,9 +78,25 @@ public class EmployeeDetails extends AppCompatActivity {
         editTextPhoneNumber = findViewById(R.id.edittext_phone_number);
         editTextEmail = findViewById(R.id.edittext_email);
         editTextResidence = findViewById(R.id.edittext_residence);
+        editTextHireDate = findViewById(R.id.edittext_hire_date);
+        editTextSalary = findViewById(R.id.edittext_salary);
         spinnerDepartment = findViewById(R.id.spinner_department);
         spinnerPosition = findViewById(R.id.spinner_position);
+        spinnerGender = findViewById(R.id.spinner_gender);
         profileImageView = findViewById(R.id.image_profile2);
+
+        // Thiết lập Spinner giới tính
+        ArrayAdapter<CharSequence> genderAdapter = ArrayAdapter.createFromResource(
+                this, R.array.gender_options, android.R.layout.simple_spinner_item);
+        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerGender.setAdapter(genderAdapter);
+
+        // Thiết lập DatePicker cho ngày vào làm
+        editTextHireDate.setOnClickListener(v -> {
+            if (isEditMode) {
+                showDatePickerDialog();
+            }
+        });
 
         long employeeId = getIntent().getLongExtra("employeeId", -1);
         loadDepartments();
@@ -92,20 +111,28 @@ public class EmployeeDetails extends AppCompatActivity {
                 @SuppressLint("Range") String residence = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_RESIDENCE));
                 @SuppressLint("Range") long departmentId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_DEPARTMENT_ID));
                 @SuppressLint("Range") String position = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_POSITION));
+                @SuppressLint("Range") String gender = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_GENDER));
+                @SuppressLint("Range") String hireDate = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_HIRE_DATE));
+                @SuppressLint("Range") double salary = cursor.getDouble(cursor.getColumnIndex(Constants.COLUMN_SALARY));
 
                 editTextFirstName.setText(firstName);
                 editTextLastName.setText(lastName);
                 editTextPhoneNumber.setText(phoneNumber);
                 editTextEmail.setText(email);
                 editTextResidence.setText(residence);
+                editTextHireDate.setText(hireDate);
+                editTextSalary.setText(String.valueOf(salary));
 
                 setEditTextReadonly(editTextFirstName);
                 setEditTextReadonly(editTextLastName);
                 setEditTextReadonly(editTextPhoneNumber);
                 setEditTextReadonly(editTextEmail);
                 setEditTextReadonly(editTextResidence);
+                setEditTextReadonly(editTextHireDate);
+                setEditTextReadonly(editTextSalary);
                 spinnerDepartment.setEnabled(false);
                 spinnerPosition.setEnabled(false);
+                spinnerGender.setEnabled(false);
 
                 // Set department spinner
                 for (int i = 0; i < departments.size(); i++) {
@@ -124,6 +151,17 @@ public class EmployeeDetails extends AppCompatActivity {
                     }
                 }
 
+                // Set gender spinner
+                if (gender != null) {
+                    ArrayAdapter<CharSequence> adapter = (ArrayAdapter<CharSequence>) spinnerGender.getAdapter();
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        if (adapter.getItem(i).toString().equals(gender)) {
+                            spinnerGender.setSelection(i);
+                            break;
+                        }
+                    }
+                }
+
                 profileImageView.setImageResource(R.drawable.ic_launcher_background);
                 byte[] imageData = employeeDAO.getEmployeeProfileImage(employeeId);
                 if (imageData != null) {
@@ -135,13 +173,13 @@ public class EmployeeDetails extends AppCompatActivity {
 
                 cursor.close();
             } else {
-                Log.d("Employee Details", "No employee found with ID: " + employeeId);
+                Log.d("Employee Details", "Không tìm thấy nhân viên với ID: " + employeeId);
                 if (cursor != null) {
                     cursor.close();
                 }
             }
         } else {
-            Log.d("Employee Details", "Invalid employee ID");
+            Log.d("Employee Details", "ID nhân viên không hợp lệ");
         }
 
         spinnerDepartment.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -157,6 +195,22 @@ public class EmployeeDetails extends AppCompatActivity {
                 updatePositionSpinner(new String[]{});
             }
         });
+    }
+
+    private void showDatePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    String formattedDate = String.format(Locale.US, "%d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay);
+                    editTextHireDate.setText(formattedDate);
+                },
+                year, month, day);
+        datePickerDialog.show();
     }
 
     private void loadDepartments() {
@@ -209,16 +263,22 @@ public class EmployeeDetails extends AppCompatActivity {
             setEditTextEditable(editTextPhoneNumber);
             setEditTextEditable(editTextEmail);
             setEditTextEditable(editTextResidence);
+            setEditTextEditable(editTextHireDate);
+            setEditTextEditable(editTextSalary);
             spinnerDepartment.setEnabled(true);
             spinnerPosition.setEnabled(spinnerPosition.getAdapter().getCount() > 0);
+            spinnerGender.setEnabled(true);
         } else {
             setEditTextReadonly(editTextFirstName);
             setEditTextReadonly(editTextLastName);
             setEditTextReadonly(editTextPhoneNumber);
             setEditTextReadonly(editTextEmail);
             setEditTextReadonly(editTextResidence);
+            setEditTextReadonly(editTextHireDate);
+            setEditTextReadonly(editTextSalary);
             spinnerDepartment.setEnabled(false);
             spinnerPosition.setEnabled(false);
+            spinnerGender.setEnabled(false);
         }
     }
 
@@ -338,27 +398,43 @@ public class EmployeeDetails extends AppCompatActivity {
             String email = editTextEmail.getText().toString();
             String residence = editTextResidence.getText().toString();
             String position = spinnerPosition.getSelectedItem() != null ? spinnerPosition.getSelectedItem().toString() : "";
+            String gender = spinnerGender.getSelectedItem() != null ? spinnerGender.getSelectedItem().toString() : "";
+            String hireDate = editTextHireDate.getText().toString();
+            String salaryStr = editTextSalary.getText().toString();
             byte[] imageBytes = convertImageToByteArray();
 
             if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) ||
                     TextUtils.isEmpty(phoneNumber) || TextUtils.isEmpty(email) ||
-                    TextUtils.isEmpty(residence) || selectedDepartmentId == -1 || TextUtils.isEmpty(position)) {
+                    TextUtils.isEmpty(residence) || selectedDepartmentId == -1 ||
+                    TextUtils.isEmpty(position) || TextUtils.isEmpty(gender) ||
+                    TextUtils.isEmpty(hireDate) || TextUtils.isEmpty(salaryStr)) {
                 Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
                 return;
             }
             if (imageBytes == null) {
-                Toast.makeText(this, "Failed to process profile image", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Không thể xử lý ảnh hồ sơ", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Employee employee = new Employee(firstName, lastName, phoneNumber, email, selectedDepartmentId, position, residence);
+
+            // Chuyển đổi mức lương
+            double salary;
+            try {
+                salary = Double.parseDouble(salaryStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Mức lương không hợp lệ", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Employee employee = new Employee(firstName, lastName, phoneNumber, email,
+                    selectedDepartmentId, position, residence, gender, hireDate, salary);
             int rowsAffected = employeeDAO.updateEmployee(employeeId, employee, imageBytes);
             if (rowsAffected > 0) {
-                Toast.makeText(this, "Employee updated successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Cập nhật nhân viên thành công", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Failed to update employee", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Cập nhật nhân viên thất bại", Toast.LENGTH_SHORT).show();
             }
         } else {
-            Log.d("Update Employee", "Invalid employee ID");
+            Log.d("Update Employee", "ID nhân viên không hợp lệ");
         }
     }
 

@@ -18,6 +18,8 @@
     <string name="menu_title">Menu</string>
     <string name="menu_departments">Phòng ban</string>
     <string name="menu_settings">Cài đặt</string>
+    <string name="menu_user">Người dùng</string>
+
 
     <!-- Details -->
     <string name="DetailsTitle">Thông tin</string>
@@ -43,6 +45,12 @@
     <string name="department_hint">Chọn phòng ban</string>
     <string name="position_hint">Chọn chức vụ</string>
     <string name="residence_hint">Nhập địa chỉ</string>
+    <string name="gender_title">Giới tính</string>
+    <string name="gender_hint">Chọn giới tính</string>
+    <string name="hire_date_title">Ngày vào làm</string>
+    <string name="hire_date_hint">Nhập ngày vào làm (VD: 2025-05-19)</string>
+    <string name="salary_title">Mức lương</string>
+    <string name="salary_hint">Nhập mức lương</string>
 
     <!-- Department -->
     <string name="department_list">Danh sách phòng ban</string>

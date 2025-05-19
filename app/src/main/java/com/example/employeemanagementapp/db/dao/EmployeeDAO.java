@@ -30,6 +30,9 @@ public class EmployeeDAO {
         values.put(Constants.COLUMN_RESIDENCE, emp.getResidence());
         values.put(Constants.COLUMN_DEPARTMENT_ID, emp.getDepartmentId());
         values.put(Constants.COLUMN_POSITION, emp.getPosition());
+        values.put(Constants.COLUMN_GENDER, emp.getGender()); // Thêm giới tính
+        values.put(Constants.COLUMN_HIRE_DATE, emp.getHireDate()); // Thêm ngày vào làm
+        values.put(Constants.COLUMN_SALARY, emp.getSalary()); // Thêm mức lương
         return db.insert(Constants.TABLE_EMPLOYEE, null, values);
     }
 
@@ -43,6 +46,9 @@ public class EmployeeDAO {
         values.put(Constants.COLUMN_RESIDENCE, emp.getResidence());
         values.put(Constants.COLUMN_DEPARTMENT_ID, emp.getDepartmentId());
         values.put(Constants.COLUMN_POSITION, emp.getPosition());
+        values.put(Constants.COLUMN_GENDER, emp.getGender()); // Thêm giới tính
+        values.put(Constants.COLUMN_HIRE_DATE, emp.getHireDate()); // Thêm ngày vào làm
+        values.put(Constants.COLUMN_SALARY, emp.getSalary()); // Thêm mức
         return db.update(Constants.TABLE_EMPLOYEE, values, Constants.COLUMN_ID + "=?", new String[]{String.valueOf(id)});
     }
 

@@ -1,4 +1,13 @@
 <resources>
+
+    <string-array name="gender_options">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+        <item>Nam</item>
+        <item>Nữ</item>
+        <item>Khác</item>
+    </string-array>
     <!-- Reply Preference -->
     <string-array name="language_entries">
         <item>English</item>

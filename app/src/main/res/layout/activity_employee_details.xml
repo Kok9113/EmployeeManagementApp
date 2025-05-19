@@ -134,6 +134,15 @@
                 android:hint="@string/last_name_hint"
                 android:padding="15sp" />
 
+            <Spinner
+                android:id="@+id/spinner_gender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20sp"
+                android:layout_marginTop="20sp"
+                android:background="@drawable/edittext_border"
+                android:padding="15sp" />
+
             <EditText
                 android:id="@+id/edittext_phone_number"
                 android:layout_width="match_parent"
@@ -173,6 +182,31 @@
                 android:layout_marginTop="20sp"
                 android:background="@drawable/edittext_border"
                 android:padding="15sp" />
+
+            <EditText
+                android:id="@+id/edittext_hire_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20sp"
+                android:layout_marginTop="20sp"
+                android:background="@drawable/edittext_border"
+                android:hint="@string/hire_date_hint"
+                android:padding="15sp"
+                android:inputType="none"
+                android:focusable="false"
+                android:focusableInTouchMode="false" />
+
+            <!-- Thêm trường Mức lương -->
+            <EditText
+                android:id="@+id/edittext_salary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20sp"
+                android:layout_marginTop="20sp"
+                android:background="@drawable/edittext_border"
+                android:hint="@string/salary_hint"
+                android:padding="15sp"
+                android:inputType="numberDecimal" />
 
             <EditText
                 android:id="@+id/edittext_residence"
