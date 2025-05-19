@@ -29,7 +29,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/department_details"
+            android:text="@string/role_detail"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
@@ -45,8 +45,8 @@
                 android:id="@+id/action_edit"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/ic_modifier"
                 app:tint="@color/colorIcon"
+                android:src="@drawable/ic_modifier"
                 android:contentDescription="@string/edit"
                 android:padding="8dp" />
 
@@ -55,8 +55,8 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:src="@drawable/ic_supprimer"
-                app:tint="@color/colorIcon"
                 android:contentDescription="@string/delete"
+                app:tint="@color/colorIcon"
                 android:padding="8dp" />
 
         </LinearLayout>
@@ -68,39 +68,39 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
-        android:background="#FFFFFF"
+        android:background="@color/colorDetail"
         android:elevation="2dp"
         android:layout_margin="16dp">
 
         <TextView
-            android:id="@+id/text_dept_name_label"
+            android:id="@+id/text_name_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/department_name"
+            android:text="@string/role_name"
             android:textSize="16sp"
-            android:textColor="#333333"
+            android:textColor="@color/colorGray"
             android:layout_marginBottom="4dp" />
 
         <TextView
-            android:id="@+id/text_dept_name"
+            android:id="@+id/text_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="40dp"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="@color/colorWhite"
             android:hint="Không có dữ liệu"
             android:padding="8dp"
-            android:background="#F0F0F0"
+            android:background="@color/backgroundGray"
             android:layout_marginBottom="16dp" />
 
         <TextView
-            android:id="@+id/text_dept_positions_label"
+            android:id="@+id/text_positions_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/department_positions"
+            android:text="@string/permission_list"
             android:textSize="16sp"
-            android:textColor="#333333"
+            android:textColor="@color/colorWhite"
             android:layout_marginBottom="4dp" />
 
         <ListView
@@ -108,7 +108,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="100dp"
-            android:background="#F0F0F0"
+            android:background="@color/backgroundGray"
             android:padding="8dp"
             android:divider="@android:color/darker_gray"
             android:dividerHeight="1dp" />

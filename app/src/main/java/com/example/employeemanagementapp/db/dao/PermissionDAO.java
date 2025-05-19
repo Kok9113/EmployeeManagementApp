@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.example.employeemanagementapp.db.DatabaseHelper;
 import com.example.employeemanagementapp.utils.Constants;
@@ -35,7 +36,7 @@ public class PermissionDAO {
                 "WHERE u." + Constants.COLUMN_USER_ID + " = ?";
 
 
-        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), String.valueOf(userId)})) {
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId)})) {
             int nameIndex = cursor.getColumnIndex(Constants.COLUMN_PERMISSION_NAME);
             if (nameIndex >= 0 && cursor.moveToFirst()) {
                 do {
@@ -167,6 +168,74 @@ public class PermissionDAO {
         }
 
         return rowsDeleted;
+    }
+
+    public List<String> getPermissionsByRoleId(long roleId) {
+        List<String> permissions = new ArrayList<>();
+        String query = "SELECT p." + Constants.COLUMN_PERMISSION_NAME +
+                " FROM " + Constants.TABLE_PERMISSIONS + " p " +
+                "JOIN " + Constants.TABLE_ROLE_PERMISSIONS + " rp " +
+                "ON p." + Constants.COLUMN_PERMISSION_ID + " = rp." + Constants.COLUMN_ROLE_PERMISSION_PERMISSION_ID + " " +
+                "WHERE rp." + Constants.COLUMN_ROLE_PERMISSION_ROLE_ID + " = ?";
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(roleId)})) {
+            int nameIndex = cursor.getColumnIndex(Constants.COLUMN_PERMISSION_NAME);
+            if (nameIndex >= 0 && cursor.moveToFirst()) {
+                do {
+                    permissions.add(cursor.getString(nameIndex));
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e("PermissionDAO", "Lỗi khi lấy quyền theo role ID: " + e.getMessage());
+        }
+        return permissions;
+    }
+    public List<String> getAllPermissions() {
+        List<String> permissions = new ArrayList<>();
+
+        String query = "SELECT " + Constants.COLUMN_PERMISSION_NAME +
+                " FROM " + Constants.TABLE_PERMISSIONS;
+
+        try (Cursor cursor = db.rawQuery(query, null)) {
+            int nameIndex = cursor.getColumnIndex(Constants.COLUMN_PERMISSION_NAME);
+            if (nameIndex >= 0 && cursor.moveToFirst()) {
+                do {
+                    String permissionName = cursor.getString(nameIndex);
+                    if (permissionName != null) {
+                        permissions.add(permissionName);
+                    }
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            android.util.Log.e("PermissionDAO", "Lỗi khi lấy danh sách permissions: " + e.getMessage());
+        }
+
+        return permissions;
+    }
+
+    public List<String> getPermissionNamesByRoleId(long roleId) {
+        List<String> permissionNames = new ArrayList<>();
+
+        String query = "SELECT p." + Constants.COLUMN_PERMISSION_NAME +
+                " FROM " + Constants.TABLE_PERMISSIONS + " p " +
+                "JOIN " + Constants.TABLE_ROLE_PERMISSIONS + " rp " +
+                "ON p." + Constants.COLUMN_PERMISSION_ID + " = rp." + Constants.COLUMN_ROLE_PERMISSION_PERMISSION_ID + " " +
+                "WHERE rp." + Constants.COLUMN_ROLE_PERMISSION_ROLE_ID + " = ?";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(roleId)})) {
+            int nameIndex = cursor.getColumnIndex(Constants.COLUMN_PERMISSION_NAME);
+            if (nameIndex >= 0 && cursor.moveToFirst()) {
+                do {
+                    String permissionName = cursor.getString(nameIndex);
+                    if (permissionName != null) {
+                        permissionNames.add(permissionName);
+                    }
+                } while (cursor.moveToNext());
+            }
+        } catch (Exception e) {
+            Log.e("PermissionDAO", "Lỗi khi lấy tên permission theo roleId: " + e.getMessage());
+        }
+
+        return permissionNames;
     }
 
     public void close() {

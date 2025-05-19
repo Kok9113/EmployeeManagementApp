@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.example.employeemanagementapp.db.DatabaseHelper;
 import com.example.employeemanagementapp.db.model.User;
@@ -34,11 +35,17 @@ public class UserDAO {
     }
 
     // Các phương thức khác giữ nguyên...
-    public boolean registerUser(String username, String password) {
+    public boolean registerUser(String username, String password, int role) {
         ContentValues values = new ContentValues();
         values.put(Constants.COLUMN_USER_NAME, username);
         values.put(Constants.COLUMN_USER_PASSWORD, password);
 
+        // Chỉ thêm role nếu nó không null và không rỗng
+        if (role > 0) {
+            values.put(Constants.COLUMN_USER_ROLE_ID, role);
+        }
+
+        // Kiểm tra user đã tồn tại chưa
         Cursor cursor = db.query(Constants.TABLE_USERS, null,
                 Constants.COLUMN_USER_NAME + " = ?", new String[]{username},
                 null, null, null);
@@ -53,6 +60,7 @@ public class UserDAO {
         return result != -1;
     }
 
+
     public User getUserById(int userId) {
         Cursor cursor = db.query(
                 Constants.TABLE_USERS,
@@ -65,8 +73,10 @@ public class UserDAO {
         if (cursor != null && cursor.moveToFirst()) {
             String username = cursor.getString(cursor.getColumnIndexOrThrow(Constants.COLUMN_USER_NAME));
             String password = cursor.getString(cursor.getColumnIndexOrThrow(Constants.COLUMN_USER_PASSWORD));
+            Long roleId = cursor.getLong(cursor.getColumnIndexOrThrow(Constants.COLUMN_USER_ROLE_ID));
+            Log.e("role", String.valueOf(roleId));
             cursor.close();
-            return new User(userId, username, password);
+            return new User(userId, username, password, roleId);
         }
 
         if (cursor != null) {
@@ -87,6 +97,21 @@ public class UserDAO {
         return exists;
     }
 
+    public int checkLoginAndGetUserId(String username, String password) {
+        Cursor cursor = db.query(Constants.TABLE_USERS,
+                new String[]{Constants.COLUMN_USER_ID},
+                Constants.COLUMN_USER_NAME + "=? AND " + Constants.COLUMN_USER_PASSWORD + "=?",
+                new String[]{username, password},
+                null, null, null);
+
+        int userId = -1; // giá trị mặc định nếu không tìm thấy
+        if (cursor.moveToFirst()) {  // di chuyển đến dòng đầu tiên nếu có
+            userId = cursor.getInt(cursor.getColumnIndexOrThrow(Constants.COLUMN_USER_ID));
+        }
+        cursor.close();
+        return userId;
+    }
+
     public long addUser(User user) {
         ContentValues values = new ContentValues();
         values.put(Constants.COLUMN_USER_NAME, user.getUsername());
@@ -97,10 +122,29 @@ public class UserDAO {
         return userId;
     }
 
+    public boolean userHasPermission(int userId, String permissionName) {
+        String query = "SELECT 1 " +
+                "FROM " + Constants.TABLE_PERMISSIONS + " p " +
+                "JOIN " + Constants.TABLE_ROLE_PERMISSIONS + " rp " +
+                "ON p." + Constants.COLUMN_PERMISSION_ID + " = rp." + Constants.COLUMN_ROLE_PERMISSION_PERMISSION_ID + " " +
+                "JOIN " + Constants.TABLE_USERS + " u " +
+                "ON rp." + Constants.COLUMN_ROLE_PERMISSION_ROLE_ID + " = u." + Constants.COLUMN_USER_ROLE_ID + " " +
+                "WHERE u." + Constants.COLUMN_USER_ID + " = ? AND p." + Constants.COLUMN_PERMISSION_NAME + " = ? " +
+                "LIMIT 1";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(userId), permissionName})) {
+            return cursor.moveToFirst(); // true nếu có quyền, false nếu không
+        } catch (Exception e) {
+            android.util.Log.e("PermissionDAO", "Lỗi khi kiểm tra permission: " + e.getMessage());
+            return false;
+        }
+    }
+
     public int updateUser(User user) {
         ContentValues values = new ContentValues();
         values.put(Constants.COLUMN_USER_NAME, user.getUsername());
         values.put(Constants.COLUMN_USER_PASSWORD, user.getPassword());
+        values.put(Constants.COLUMN_USER_ROLE_ID, user.getRoleId()); // <- Thêm dòng này
 
         return db.update(Constants.TABLE_USERS, values,
                 Constants.COLUMN_USER_ID + " = ?", new String[]{String.valueOf(user.getId())});
@@ -122,8 +166,9 @@ public class UserDAO {
                 Constants.COLUMN_USER_ID + " = ?", new String[]{String.valueOf(userId)});
     }
 
-    public void deleteUser(long userId) {
-        db.delete(Constants.TABLE_USERS, Constants.COLUMN_USER_ID + " = ?", new String[]{String.valueOf(userId)});
+
+    public int deleteUser(int userId) {
+        return db.delete(Constants.TABLE_USERS, Constants.COLUMN_USER_ID + " = ?", new String[]{String.valueOf(userId)});
     }
 
     public int getUserRole(int userId) {

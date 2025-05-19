@@ -103,6 +103,10 @@
     <string name="user_list">Danh sách người dùng</string>
     <string name="user_detail">Chi tiết người dùng</string>
     <string name="edit_user">Sửa người dùng</string>
+    <string name="add_user_title">Thêm người dùng</string>
+    <string name="username">Tên người dùng</string>
+    <string name="password">Mật khẩu</string>
+
 
     <!--Role-->
     <string name="role_list">Danh sách vai trò</string>

@@ -1,5 +1,6 @@
 package com.example.employeemanagementapp.ui.user;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -7,18 +8,25 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.employeemanagementapp.R;
+import com.example.employeemanagementapp.db.dao.RoleDAO;
 import com.example.employeemanagementapp.db.dao.UserDAO;
+import com.example.employeemanagementapp.db.model.Role;
 import com.example.employeemanagementapp.db.model.User;
+import com.example.employeemanagementapp.ui.role.EditRoleActivity;
+import com.example.employeemanagementapp.ui.role.RoleDetailActivity;
 
 public class UserDetailsActivity extends AppCompatActivity {
 
     private static final int EDIT_USER_REQUEST_CODE = 2;
 
-    private TextView textUsername, textPassword;
-    private Button buttonDelete, buttonEdit, buttonBack;
+    private TextView textUsername, textRole;
     private UserDAO userDAO;
+    private RoleDAO roleDAO;
+
     private int userId;
 
     @Override
@@ -27,11 +35,11 @@ public class UserDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_details);
 
         textUsername = findViewById(R.id.text_username);
-        textPassword = findViewById(R.id.text_password);
-        buttonDelete = findViewById(R.id.button_delete_user);
-        buttonEdit = findViewById(R.id.button_edit_user);
+        textRole = findViewById(R.id.text_role);
 
         userDAO = new UserDAO(this);
+        roleDAO = new RoleDAO(this);
+
 
         userId = getIntent().getIntExtra("userId", -1);
         if (userId == -1) {
@@ -42,17 +50,26 @@ public class UserDetailsActivity extends AppCompatActivity {
 
         displayUserDetails();
 
-        buttonDelete.setOnClickListener(v -> {
-            userDAO.deleteUser(userId);
-            Toast.makeText(this, "Đã xóa người dùng", Toast.LENGTH_SHORT).show();
-            setResult(RESULT_OK);
-            finish();
+
+        // Xử lý sự kiện nút Delete
+        ImageView actionDelete = findViewById(R.id.action_delete);
+        actionDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmDeleteUser();
+            }
         });
 
-        buttonEdit.setOnClickListener(v -> {
-            Intent intent = new Intent(UserDetailsActivity.this, EditUserActivity.class);
-            intent.putExtra("userId", userId);
-            startActivityForResult(intent, EDIT_USER_REQUEST_CODE);
+
+        // Xử lý sự kiện nút Edit
+        ImageView actionEdit = findViewById(R.id.action_edit);
+        actionEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserDetailsActivity.this, EditUserActivity.class);
+                intent.putExtra("userId", userId);
+                startActivityForResult(intent, EDIT_USER_REQUEST_CODE);
+            }
         });
 
         ImageView backIcon = findViewById(R.id.image_back);
@@ -66,12 +83,38 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     private void displayUserDetails() {
         User user = userDAO.getUserById(userId);
+        String role = roleDAO.getRoleNameByIdLong(user.getRoleId());
         if (user != null) {
-            textUsername.setText("Tên đăng nhập: " + user.getUsername());
-            textPassword.setText("Mật khẩu: " + user.getPassword());
+            textUsername.setText(String.format("%s: %s", getString(R.string.username), user.getUsername()));
+            textRole.setText(String.format("%s: %s", getString(R.string.role_name), String.valueOf(role)));
         } else {
-            Toast.makeText(this, "Không tìm thấy người dùng", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.not_found, Toast.LENGTH_SHORT).show();
             finish();
+        }
+    }
+
+    private void confirmDeleteUser() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.confirm_delete)
+                .setMessage(R.string.delete_message)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        deleteUser();
+                    }
+                })
+                .setNegativeButton(R.string.no, null)
+                .show();
+    }
+
+    private void deleteUser() {
+        int rowsDeleted = userDAO.deleteUser(userId);
+        if (rowsDeleted > 0) {
+            Toast.makeText(this, R.string.deleted_success, Toast.LENGTH_SHORT).show();
+            setResult(RESULT_OK);
+            finish();
+        } else {
+            Toast.makeText(this, R.string.deleted_failed, Toast.LENGTH_SHORT).show();
         }
     }
 

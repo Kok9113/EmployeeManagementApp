@@ -140,6 +140,13 @@ public class RoleDAO {
 
         return role;
     }
+
+    public Cursor getRoleByIdCursor(long roleId) {
+        String query = "SELECT " + Constants.COLUMN_ROLE_ID + ", " + Constants.COLUMN_ROLE_NAME +
+                " FROM " + Constants.TABLE_ROLES +
+                " WHERE " + Constants.COLUMN_ROLE_ID + " = ?";
+        return db.rawQuery(query, new String[]{String.valueOf(roleId)});
+    }
     public long insertRole(String roleName) {
         long result = -1;
 
@@ -161,6 +168,136 @@ public class RoleDAO {
         }
 
         return result;
+    }
+
+    public void insertRolePermissions(long roleId, List<Long> permissionIds) {
+        String insertQuery = "INSERT INTO " + Constants.TABLE_ROLE_PERMISSIONS +
+                " (" + Constants.COLUMN_ROLE_PERMISSION_ROLE_ID + ", " +
+                Constants.COLUMN_ROLE_PERMISSION_PERMISSION_ID + ") VALUES (?, ?)";
+
+        try {
+            db.beginTransaction();
+            for (Long permissionId : permissionIds) {
+                db.execSQL(insertQuery, new Object[]{roleId, permissionId});
+            }
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            android.util.Log.e("RoleDAO", "Lỗi khi thêm role_permissions: " + e.getMessage());
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public int deleteRole(long roleId) {
+        int rowsDeleted = 0;
+
+        try {
+            db.beginTransaction();
+
+            // Xóa các quyền liên kết với role trong bảng role_permissions trước
+            db.delete(
+                    Constants.TABLE_ROLE_PERMISSIONS,
+                    Constants.COLUMN_ROLE_PERMISSION_ROLE_ID + " = ?",
+                    new String[]{String.valueOf(roleId)}
+            );
+
+            // Sau đó xóa role chính trong bảng roles
+            rowsDeleted = db.delete(
+                    Constants.TABLE_ROLES,
+                    Constants.COLUMN_ROLE_ID + " = ?",
+                    new String[]{String.valueOf(roleId)}
+            );
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            android.util.Log.e("RoleDAO", "Lỗi khi xóa role: " + e.getMessage());
+        } finally {
+            db.endTransaction();
+        }
+
+        return rowsDeleted;
+    }
+
+    public String getRoleNameById(long roleId) {
+        String roleName = null;
+        String query = "SELECT " + Constants.COLUMN_ROLE_NAME + " FROM " + Constants.TABLE_ROLES +
+                " WHERE " + Constants.COLUMN_ROLE_ID + " = ?";
+
+        try (Cursor cursor = db.rawQuery(query, new String[]{String.valueOf(roleId)})) {
+            if (cursor.moveToFirst()) {
+                roleName = cursor.getString(cursor.getColumnIndexOrThrow(Constants.COLUMN_ROLE_NAME));
+            }
+        } catch (Exception e) {
+            android.util.Log.e("RoleDAO", "Lỗi getRoleNameById: " + e.getMessage());
+        }
+
+        return roleName;
+    }
+    public boolean updateRoleName(long roleId, String newName) {
+        boolean success = false;
+
+        String query = "UPDATE " + Constants.TABLE_ROLES +
+                " SET " + Constants.COLUMN_ROLE_NAME + " = ? WHERE " + Constants.COLUMN_ROLE_ID + " = ?";
+
+        try {
+            db.beginTransaction();
+            db.execSQL(query, new Object[]{newName, roleId});
+            db.setTransactionSuccessful();
+            success = true;
+        } catch (Exception e) {
+            android.util.Log.e("RoleDAO", "Lỗi updateRoleName: " + e.getMessage());
+        } finally {
+            db.endTransaction();
+        }
+
+        return success;
+    }
+    public void updateRolePermissions(long roleId, List<Long> newPermissionIds) {
+        String deleteQuery = "DELETE FROM " + Constants.TABLE_ROLE_PERMISSIONS +
+                " WHERE " + Constants.COLUMN_ROLE_PERMISSION_ROLE_ID + " = ?";
+        String insertQuery = "INSERT INTO " + Constants.TABLE_ROLE_PERMISSIONS +
+                " (" + Constants.COLUMN_ROLE_PERMISSION_ROLE_ID + ", " +
+                Constants.COLUMN_ROLE_PERMISSION_PERMISSION_ID + ") VALUES (?, ?)";
+
+        try {
+            db.beginTransaction();
+
+            // Xoá quyền cũ
+            db.execSQL(deleteQuery, new Object[]{roleId});
+
+            // Thêm quyền mới
+            for (Long permissionId : newPermissionIds) {
+                db.execSQL(insertQuery, new Object[]{roleId, permissionId});
+            }
+
+            db.setTransactionSuccessful();
+        } catch (Exception e) {
+            android.util.Log.e("RoleDAO", "Lỗi updateRolePermissions: " + e.getMessage());
+        } finally {
+            db.endTransaction();
+        }
+    }
+    public String getRoleNameByIdLong(long roleId) {
+        String roleName = null;
+        Cursor cursor = null;
+        try {
+            cursor = db.query(
+                    Constants.TABLE_ROLES,
+                    new String[]{Constants.COLUMN_ROLE_NAME},
+                    Constants.COLUMN_ROLE_ID + " = ?",
+                    new String[]{String.valueOf(roleId)},
+                    null, null, null
+            );
+
+            if (cursor != null && cursor.moveToFirst()) {
+                roleName = cursor.getString(cursor.getColumnIndexOrThrow(Constants.COLUMN_ROLE_NAME));
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return roleName;
     }
 
     public void close() {

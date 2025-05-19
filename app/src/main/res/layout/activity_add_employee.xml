@@ -49,6 +49,7 @@
                 android:layout_gravity="center_vertical"
                 android:contentDescription="Validate"
                 android:padding="8dp"
+                app:tint="@color/colorIcon"
                 android:src="@drawable/ic_check" />
         </LinearLayout>
 

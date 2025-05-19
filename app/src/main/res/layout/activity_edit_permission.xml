@@ -43,6 +43,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:padding="8dp"
+            app:tint="@color/colorIcon"
             android:src="@drawable/ic_check"
             android:contentDescription="@string/validate_icon" />
     </LinearLayout>

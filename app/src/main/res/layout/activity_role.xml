@@ -50,6 +50,7 @@
         android:layout_margin="30dp"
         android:background="@drawable/rounded_button_background"
         android:text="+"
+        android:textColor="@color/textColor"
         android:textSize="25sp" />
 
 </LinearLayout>

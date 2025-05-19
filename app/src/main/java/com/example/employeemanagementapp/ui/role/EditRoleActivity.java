@@ -2,7 +2,6 @@ package com.example.employeemanagementapp.ui.role;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -18,12 +17,11 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.employeemanagementapp.R;
 import com.example.employeemanagementapp.db.dao.PermissionDAO;
 import com.example.employeemanagementapp.db.dao.RoleDAO;
-import com.example.employeemanagementapp.db.dao.UserDAO;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AddRoleActivity extends AppCompatActivity {
+public class EditRoleActivity extends AppCompatActivity {
 
     private EditText edtRoleName;
     private RoleDAO roleDAO;
@@ -31,31 +29,46 @@ public class AddRoleActivity extends AppCompatActivity {
 
     private List<String> selectedPermissions = new ArrayList<>();
     private List<String> permissionList = new ArrayList<>();
-    private boolean[] selectedStates ;
+    private boolean[] selectedStates;
+
+    private long roleId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_role);
+        setContentView(R.layout.activity_edit_role);
 
         edtRoleName = findViewById(R.id.edtRoleName);
-
         roleDAO = new RoleDAO(this);
         permissionDAO = new PermissionDAO(this);
-        permissionList = permissionDAO.getAllPermissions(); // giả sử trả về List<String>
+
+        roleId = getIntent().getLongExtra("roleId", -1);
+        if (roleId == -1) {
+            Toast.makeText(this, "Invalid Role ID", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        permissionList = permissionDAO.getAllPermissions();
         selectedStates = new boolean[permissionList.size()];
 
+        // Load role name and selected permissions
+        String roleName = roleDAO.getRoleNameById(roleId);
+        List<String> currentPermissions = permissionDAO.getPermissionNamesByRoleId(roleId);
+        selectedPermissions.addAll(currentPermissions);
+        edtRoleName.setText(roleName);
+
+        for (int i = 0; i < permissionList.size(); i++) {
+            selectedStates[i] = currentPermissions.contains(permissionList.get(i));
+        }
+
         ImageView backIcon = findViewById(R.id.image_back);
-        backIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        backIcon.setOnClickListener(v -> finish());
+
+        updatePermissionText();
     }
 
-    // Hàm xử lý thêm người dùng mới
-    public void addRole(View view) {
+    public void updateRole(View view) {
         String roleName = edtRoleName.getText().toString().trim();
 
         if (roleName.isEmpty()) {
@@ -64,22 +77,20 @@ public class AddRoleActivity extends AppCompatActivity {
         }
 
         if (selectedPermissions.isEmpty()) {
-            Toast.makeText(this, "Vui lòng chọn ít nhất 1 quyền", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please select at least one permission", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        long newRoleId = roleDAO.insertRole(roleName);
-        if (newRoleId != -1) {
-            // ✅ Gán permissions cho role
-            PermissionDAO permissionDAO = new PermissionDAO(this);
+        boolean updated = roleDAO.updateRoleName(roleId, roleName);
+        if (updated) {
             List<Long> permissionIds = permissionDAO.getPermissionIdsByNames(selectedPermissions);
-            roleDAO.insertRolePermissions(newRoleId, permissionIds);
+            roleDAO.updateRolePermissions(roleId, permissionIds);
 
-            Toast.makeText(this, "Role added successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Role updated successfully", Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);
-            finish(); // Quay lại trang trước
+            finish();
         } else {
-            Toast.makeText(this, "Failed to add role", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Failed to update role", Toast.LENGTH_SHORT).show();
         }
     }
 

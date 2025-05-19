@@ -1,5 +1,6 @@
 package com.example.employeemanagementapp.ui.role;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -52,8 +53,8 @@ public class RoleActivity extends AppCompatActivity {
 
         roleListView.setOnItemClickListener((parent, view, position, id) -> {
             Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-            int roleId = cursor.getInt(cursor.getColumnIndexOrThrow("_id")); // Sử dụng _id đã ánh xạ
-            Intent intent = new Intent(RoleActivity.this, UserDetailsActivity.class);
+            @SuppressLint("Range") long roleId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_ROLE_ID));
+            Intent intent = new Intent(RoleActivity.this, RoleDetailActivity.class);
             intent.putExtra("roleId", roleId);
             startActivityForResult(intent, ADD_ROLE_REQUEST_CODE);
         });

@@ -103,6 +103,9 @@
     <string name="user_list">List of User</string>
     <string name="user_detail">User detail</string>
     <string name="edit_user">Edit user</string>
+    <string name="add_user_title">Add user</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
 
 
     <!--Role-->
@@ -122,7 +125,6 @@
     <string name="per_details">Detail permission</string>
 
 
-
     <!-- Mess -->
     <string name="added_success">Added success</string>
     <string name="added_failed">Failed to add</string>
@@ -131,5 +133,7 @@
     <string name="delete_message">Are you sure you want to delete ?</string>
     <string name="deleted_success">Deleted successfully</string>
     <string name="deleted_failed">Failed to delete</string>
+    <string name="search">Search …</string>
+
 
 </resources>

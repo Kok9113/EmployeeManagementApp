@@ -138,6 +138,7 @@
             android:layout_margin="30dp"
             android:background="@drawable/rounded_button_background"
             android:text="+"
+            android:textColor="@color/textColor"
             android:textSize="25sp" />
     </LinearLayout>
 
@@ -166,7 +167,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background="@android:color/white"
             android:padding="16dp">
 
             <TextView
@@ -174,9 +175,14 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@string/menu_title"
-                android:textColor="@android:color/white"
+                android:textColor="@color/colorPrimary"
                 android:textSize="20sp" />
         </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorPrimary" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -192,6 +198,7 @@
                 android:gravity="center_vertical"
                 android:onClick="goToDepartments"
                 android:orientation="horizontal"
+                android:textColor="@color/colorPrimary"
                 android:padding="8dp">
 
                 <ImageView
@@ -216,6 +223,7 @@
                 android:gravity="center_vertical"
                 android:onClick="GoToUsers"
                 android:orientation="horizontal"
+                android:textColor="@color/colorPrimary"
                 android:padding="8dp">
 
                 <ImageView
@@ -240,6 +248,7 @@
                 android:gravity="center_vertical"
                 android:onClick="GoToRole"
                 android:orientation="horizontal"
+                android:textColor="@color/colorPrimary"
                 android:padding="8dp">
 
                 <ImageView
@@ -264,6 +273,7 @@
                 android:gravity="center_vertical"
                 android:onClick="GoToPermission"
                 android:orientation="horizontal"
+                android:textColor="@color/colorPrimary"
                 android:padding="8dp">
 
                 <ImageView
@@ -287,6 +297,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:onClick="GoToSettings"
+                android:textColor="@color/colorPrimary"
                 android:orientation="horizontal"
                 android:padding="8dp">
 

@@ -130,7 +130,7 @@ public class UserActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if ((requestCode == ADD_USER_REQUEST_CODE || requestCode == USER_DETAILS_REQUEST_CODE) && resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK) {
             displayUsers(); // Cập nhật danh sách sau khi thêm hoặc xóa/sửa người dùng
         }
     }

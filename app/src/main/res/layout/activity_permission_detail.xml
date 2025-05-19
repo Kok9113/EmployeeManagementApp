@@ -47,12 +47,14 @@
                 android:layout_height="50dp"
                 android:src="@drawable/ic_modifier"
                 android:contentDescription="@string/edit"
+                app:tint="@color/colorIcon"
                 android:padding="8dp" />
 
             <ImageView
                 android:id="@+id/action_delete"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                app:tint="@color/colorIcon"
                 android:src="@drawable/ic_supprimer"
                 android:contentDescription="@string/delete"
                 android:padding="8dp" />

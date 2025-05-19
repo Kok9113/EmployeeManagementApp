@@ -42,7 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(this, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show();
             } else {
                 // Thực hiện đăng ký với SQLite
-                boolean isRegistered = userDAO.registerUser(username, pass1);
+                boolean isRegistered = userDAO.registerUser(username, pass1, 0);
                 if (isRegistered) {
                     Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
                     // Chuyển về LoginActivity

@@ -38,4 +38,13 @@ public class Role {
     public void setPermissionIds(List<Integer> permissionIds) {
         this.permissionIds = permissionIds;
     }
+
+    public int getId() {
+        return roleId;
+    }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

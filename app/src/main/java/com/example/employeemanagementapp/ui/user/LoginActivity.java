@@ -1,6 +1,7 @@
 package com.example.employeemanagementapp.ui.user;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -44,6 +45,12 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     boolean isValid = userDAO.checkLogin(username, password);
                     if (isValid) {
+                        int userId = userDAO.checkLoginAndGetUserId(username, password);
+                        SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putInt("authUserId", userId); // ví dụ userId = 123
+                        editor.apply();
+
                         // Đăng nhập thành công
                         Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);

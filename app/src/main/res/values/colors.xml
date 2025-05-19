@@ -10,5 +10,10 @@
     <color name="colorIcon">#EBFADB</color>
     <color name="colorMenuIcon">#4E89AF</color>
 
+    <color name="colorDetail">#FFFFFF</color>
+    <color name="colorGray">#333333</color>
+    <color name="colorWhite">#000000</color>
+    <color name="backgroundGray">#F0F0F0</color>
+
 
 </resources>

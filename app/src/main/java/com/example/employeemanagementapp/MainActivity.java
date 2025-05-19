@@ -35,6 +35,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.employeemanagementapp.adapter.employee.EmployeeGridAdapter;
 import com.example.employeemanagementapp.db.DatabaseHelper;
+import com.example.employeemanagementapp.db.dao.UserDAO;
 import com.example.employeemanagementapp.ui.department.DepartmentActivity;
 import com.example.employeemanagementapp.db.dao.DepartmentDAO;
 import com.example.employeemanagementapp.db.dao.EmployeeDAO;
@@ -59,8 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int ADD_EMPLOYEE_REQUEST_CODE = 1;
 
     private DepartmentDAO departmentDAO;
-    private PermissionDAO permissionDAO; // Thêm biến instance
-    private RoleDAO roleDAO; // Thêm biến instance
+    private UserDAO userDAO;
     private SimpleCursorAdapter listAdapter;
     private EmployeeGridAdapter gridAdapter;
     private EditText searchInput;
@@ -97,35 +97,11 @@ public class MainActivity extends AppCompatActivity {
         applyLanguage();
         setContentView(R.layout.activity_main);
 
+        userDAO = new UserDAO(this);
         // Đăng ký BroadcastReceiver với ContextCompat
         IntentFilter filter = new IntentFilter("LANGUAGE_CHANGED");
         ContextCompat.registerReceiver(this, languageChangeReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
         searchInput = findViewById(R.id.search_input);
-
-        SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
-        int userId = sharedPreferences.getInt("userId", -1);
-
-        if (userId != -1) {
-            permissionDAO = new PermissionDAO(this);
-            roleDAO = new RoleDAO(this);
-
-            // Lấy danh sách tên quyền và vai trò
-            List<String> permissionNames = permissionDAO.getUserPermissions(userId);
-            List<String> roleNames = roleDAO.getUserRoles(userId);
-
-            // Chuyển đổi tên thành ID
-            List<Long> permissionIds = permissionNames != null ? permissionDAO.getPermissionIdsByNames(permissionNames) : new ArrayList<>();
-            List<Long> roleIds = roleNames != null ? roleDAO.getRoleIdsByNames(roleNames) : new ArrayList<>();
-
-            User user = new User(userId, "");
-            user.setPermissionIds(permissionIds);
-            user.setRoleIds(roleIds);
-
-            // Kiểm tra vai trò admin
-            if (roleDAO.hasRole(userId, "admin")) {
-                searchInput.setVisibility(View.GONE);
-            }
-        }
 
         departmentDAO = new DepartmentDAO(this);
         departmentMap = new HashMap<>();
@@ -145,6 +121,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         displayEmployees();
+
+        SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
+        int userId = sharedPreferences.getInt("authUserId", -1);
+        if (userId != -1) {
+            if (!userDAO.userHasPermission(userId, "SEARCH")) {
+                searchInput.setVisibility(View.GONE);
+            }
+        }
 
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -198,12 +182,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d("MainActivity", "Unregistering receiver and closing DAOs");
         unregisterReceiver(languageChangeReceiver);
-        if (permissionDAO != null) {
-            permissionDAO.close();
-        }
-        if (roleDAO != null) {
-            roleDAO.close();
-        }
     }
 
     @Override
