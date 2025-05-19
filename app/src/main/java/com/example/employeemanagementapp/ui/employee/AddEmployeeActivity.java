@@ -69,8 +69,11 @@ public class AddEmployeeActivity extends AppCompatActivity {
         editTextPhoneNumber = findViewById(R.id.edittext_phone_number);
         editTextEmail = findViewById(R.id.edittext_email);
         editTextResidence = findViewById(R.id.edittext_residence);
+        editTextHireDate = findViewById(R.id.edittext_hire_date);
+        editTextSalary = findViewById(R.id.edittext_salary);
         spinnerDepartment = findViewById(R.id.spinner_department);
         spinnerPosition = findViewById(R.id.spinner_position);
+        spinnerGender = findViewById(R.id.spinner_gender);
         imageViewValidate = findViewById(R.id.image_validate);
         imageViewBack = findViewById(R.id.image_back);
         imageView = findViewById(R.id.image_profile);
