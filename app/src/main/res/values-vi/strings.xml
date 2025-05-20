@@ -18,6 +18,8 @@
     <string name="menu_title">Menu</string>
     <string name="menu_departments">Phòng ban</string>
     <string name="menu_settings">Cài đặt</string>
+    <string name="menu_user">Người dùng</string>
+    <string name="menu_logout">Đăng xuất</string>
 
     <!-- Details -->
     <string name="DetailsTitle">Thông tin</string>

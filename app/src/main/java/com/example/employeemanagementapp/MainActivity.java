@@ -44,6 +44,7 @@ import com.example.employeemanagementapp.db.model.User;
 import com.example.employeemanagementapp.ui.employee.AddEmployeeActivity;
 import com.example.employeemanagementapp.ui.employee.EmployeeDetails;
 import com.example.employeemanagementapp.ui.setting.SettingsActivity;
+import com.example.employeemanagementapp.ui.user.LoginActivity;
 import com.example.employeemanagementapp.ui.user.UserActivity;
 import com.example.employeemanagementapp.utils.Constants;
 
@@ -520,6 +521,8 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout departmentsLayout = menuPanel.findViewById(R.id.menu_departments);
             LinearLayout settingsLayout = menuPanel.findViewById(R.id.menu_settings);
             LinearLayout userLayout = menuPanel.findViewById(R.id.btn_user);
+            LinearLayout logoutLayout = menuPanel.findViewById(R.id.menu_logout);
+
 
             // Tìm TextView bên trong LinearLayout
             if (departmentsLayout != null) {
@@ -538,6 +541,12 @@ public class MainActivity extends AppCompatActivity {
                 TextView usersText = userLayout.findViewById(R.id.text_username);
                 if (usersText != null) {
                     usersText.setText(getString(R.string.menu_user));
+                }
+            }
+            if (logoutLayout != null) {
+                TextView usersText = logoutLayout.findViewById(R.id.text_logout);
+                if (usersText != null) {
+                    usersText.setText(getString(R.string.menu_logout));
                 }
             }
         }
@@ -569,6 +578,20 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, UserActivity.class);
         startActivity(intent);
         closeMenu();
+    }
+
+    public void GoToLogout(View view) {
+        // Xoá dữ liệu SharedPreferences nếu cần
+        SharedPreferences preferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear(); // hoặc editor.remove("key")
+        editor.apply();
+
+        // Chuyển về màn hình đăng nhập
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     // Language
