@@ -133,6 +133,22 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:layout_marginLeft="20sp"
+                android:textSize="17sp"
+                android:text="@string/gender_title" />
+
+            <Spinner
+                android:id="@+id/spinner_gender"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20sp"
+                android:background="@drawable/edittext_border"
+                android:padding="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="20sp"
                 android:layout_marginTop="20sp"
                 android:textSize="17sp"
@@ -197,6 +213,45 @@
                 android:layout_marginHorizontal="20sp"
                 android:background="@drawable/edittext_border"
                 android:padding="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:layout_marginLeft="20sp"
+                android:textSize="17sp"
+                android:text="@string/hire_date_title" />
+
+            <EditText
+                android:id="@+id/edittext_hire_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20sp"
+                android:padding="15sp"
+                android:hint="@string/hire_date_hint"
+                android:background="@drawable/edittext_border"
+                android:inputType="none"
+                android:focusable="false"
+                android:focusableInTouchMode="false" />
+
+            <!-- Thêm trường Mức lương -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20sp"
+                android:layout_marginLeft="20sp"
+                android:textSize="17sp"
+                android:text="@string/salary_title" />
+
+            <EditText
+                android:id="@+id/edittext_salary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20sp"
+                android:padding="15sp"
+                android:hint="@string/salary_hint"
+                android:background="@drawable/edittext_border"
+                android:inputType="numberDecimal" />
 
             <TextView
                 android:layout_width="match_parent"

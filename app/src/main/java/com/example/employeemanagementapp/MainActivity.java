@@ -9,6 +9,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -407,7 +409,26 @@ public class MainActivity extends AppCompatActivity {
                             }
                             super.setViewText(v, text);
                         }
+
+                        @Override
+                        public void bindView(View view, Context context, Cursor cursor) {
+                            super.bindView(view, context, cursor);
+
+                            ImageView imageView = view.findViewById(R.id.image_profile);
+                            int imageIndex = cursor.getColumnIndex(Constants.COLUMN_IMAGE);
+                            if (imageIndex != -1) {
+                                byte[] imageBytes = cursor.getBlob(imageIndex);
+                                if (imageBytes != null && imageBytes.length > 0) {
+                                    Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                                    imageView.setImageBitmap(bitmap);
+                                } else {
+                                    imageView.setImageResource(R.drawable.ic_launcher_background);
+                                }
+                            }
+                        }
                     };
+
+
                     listView.setAdapter(listAdapter);
                 } else {
                     listAdapter.changeCursor(cursor);
@@ -447,6 +468,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
 
     private void filterEmployeeList(String query) {
         Cursor cursor = null;

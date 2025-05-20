@@ -5,12 +5,16 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.View;
 
 import com.example.employeemanagementapp.db.DatabaseHelper;
 import com.example.employeemanagementapp.db.model.Employee;
 import com.example.employeemanagementapp.utils.Constants;
+
+import java.io.ByteArrayOutputStream;
 
 public class EmployeeDAO {
     private final SQLiteDatabase db;
@@ -30,6 +34,9 @@ public class EmployeeDAO {
         values.put(Constants.COLUMN_RESIDENCE, emp.getResidence());
         values.put(Constants.COLUMN_DEPARTMENT_ID, emp.getDepartmentId());
         values.put(Constants.COLUMN_POSITION, emp.getPosition());
+        values.put(Constants.COLUMN_GENDER, emp.getGender()); // Thêm giới tính
+        values.put(Constants.COLUMN_HIRE_DATE, emp.getHireDate()); // Thêm ngày vào làm
+        values.put(Constants.COLUMN_SALARY, emp.getSalary()); // Thêm mức lương
         return db.insert(Constants.TABLE_EMPLOYEE, null, values);
     }
 
@@ -43,6 +50,9 @@ public class EmployeeDAO {
         values.put(Constants.COLUMN_RESIDENCE, emp.getResidence());
         values.put(Constants.COLUMN_DEPARTMENT_ID, emp.getDepartmentId());
         values.put(Constants.COLUMN_POSITION, emp.getPosition());
+        values.put(Constants.COLUMN_GENDER, emp.getGender()); // Thêm giới tính
+        values.put(Constants.COLUMN_HIRE_DATE, emp.getHireDate()); // Thêm ngày vào làm
+        values.put(Constants.COLUMN_SALARY, emp.getSalary()); // Thêm mức
         return db.update(Constants.TABLE_EMPLOYEE, values, Constants.COLUMN_ID + "=?", new String[]{String.valueOf(id)});
     }
 
@@ -69,22 +79,89 @@ public class EmployeeDAO {
 
 
     public Cursor getAllEmployees() {
-        return db.rawQuery("SELECT * FROM " + Constants.TABLE_EMPLOYEE, null);
+        return db.rawQuery(
+                "SELECT " +
+                        Constants.COLUMN_ID + ", " +
+                        Constants.COLUMN_FIRST_NAME + ", " +
+                        Constants.COLUMN_LAST_NAME + ", " +
+                        Constants.COLUMN_POSITION + ", " +
+                        Constants.COLUMN_IMAGE + ", " +
+                        Constants.COLUMN_DEPARTMENT_ID +
+                        " FROM " + Constants.TABLE_EMPLOYEE,
+                null
+        );
     }
 
     public Cursor getEmployeeById(long id) {
-        return db.query(Constants.TABLE_EMPLOYEE, null, Constants.COLUMN_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
+        String[] columns = {
+                Constants.COLUMN_ID,
+                Constants.COLUMN_FIRST_NAME,
+                Constants.COLUMN_LAST_NAME,
+                Constants.COLUMN_PHONE_NUMBER,
+                Constants.COLUMN_EMAIL,
+                Constants.COLUMN_RESIDENCE,
+                Constants.COLUMN_POSITION,
+                Constants.COLUMN_DEPARTMENT_ID,
+                Constants.COLUMN_GENDER,
+                Constants.COLUMN_HIRE_DATE,
+                Constants.COLUMN_SALARY
+        };
+        return db.query(Constants.TABLE_EMPLOYEE, columns, Constants.COLUMN_ID + "=?", new String[]{String.valueOf(id)}, null, null, null);
     }
 
+//    public byte[] getEmployeeProfileImage(long employeeId) {
+//        Cursor cursor = db.query(Constants.TABLE_EMPLOYEE, new String[]{Constants.COLUMN_IMAGE}, Constants.COLUMN_ID + "=?", new String[]{String.valueOf(employeeId)}, null, null, null);
+//        if (cursor != null && cursor.moveToFirst()) {
+//            @SuppressLint("Range") byte[] image = cursor.getBlob(cursor.getColumnIndex(Constants.COLUMN_IMAGE));
+//            cursor.close();
+//            return image;
+//        }
+//        return null;
+//    }
+
     public byte[] getEmployeeProfileImage(long employeeId) {
-        Cursor cursor = db.query(Constants.TABLE_EMPLOYEE, new String[]{Constants.COLUMN_IMAGE}, Constants.COLUMN_ID + "=?", new String[]{String.valueOf(employeeId)}, null, null, null);
+        Cursor cursor = db.query(Constants.TABLE_EMPLOYEE,
+                new String[]{Constants.COLUMN_IMAGE},
+                Constants.COLUMN_ID + "=?",
+                new String[]{String.valueOf(employeeId)},
+                null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
             @SuppressLint("Range") byte[] image = cursor.getBlob(cursor.getColumnIndex(Constants.COLUMN_IMAGE));
             cursor.close();
-            return image;
+
+            // Resize ảnh lấy ra (ví dụ max 800x800)
+            return resizeImage(image, 800, 800);
         }
+        if (cursor != null) cursor.close();
         return null;
     }
+
+    public byte[] resizeImage(byte[] originalImage, int maxWidth, int maxHeight) {
+        // Giải mã byte[] thành Bitmap
+        Bitmap bitmap = BitmapFactory.decodeByteArray(originalImage, 0, originalImage.length);
+        if (bitmap == null) return null;
+
+        // Tính tỉ lệ resize giữ tỉ lệ gốc
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        float ratio = Math.min((float)maxWidth / width, (float)maxHeight / height);
+
+        int newWidth = Math.round(width * ratio);
+        int newHeight = Math.round(height * ratio);
+
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+
+        // Nén Bitmap resized về byte[]
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
+
+        // Giải phóng bộ nhớ bitmap cũ
+        bitmap.recycle();
+        resizedBitmap.recycle();
+
+        return outputStream.toByteArray();
+    }
+
 
     public int deleteEmployee(long id) {
         int rowsDeleted = db.delete(Constants.TABLE_EMPLOYEE, Constants.COLUMN_ID + "=?", new String[]{String.valueOf(id)});

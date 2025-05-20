@@ -47,6 +47,12 @@
     <string name="department_hint">Chọn phòng ban</string>
     <string name="position_hint">Chọn chức vụ</string>
     <string name="residence_hint">Nhập địa chỉ</string>
+    <string name="gender_title">Giới tính</string>
+    <string name="gender_hint">Chọn giới tính</string>
+    <string name="hire_date_title">Ngày vào làm</string>
+    <string name="hire_date_hint">Nhập ngày vào làm (VD: 2025-05-19)</string>
+    <string name="salary_title">Mức lương</string>
+    <string name="salary_hint">Nhập mức lương</string>
 
     <!-- Department -->
     <string name="department_list">Danh sách phòng ban</string>
@@ -134,5 +140,12 @@
     <string name="delete_message">Bạn có chắc chắn muốn xóa không?</string>
     <string name="deleted_success">Xóa thành công</string>
     <string name="deleted_failed">Xóa thất bại</string>
+
+
+    <string-array name="gender_options">
+        <item>Nam</item>
+        <item>Nữ</item>
+        <item>Khác</item>
+    </string-array>
 
 </resources>

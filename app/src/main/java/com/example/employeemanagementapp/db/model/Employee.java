@@ -9,11 +9,17 @@ public class Employee {
     private long departmentId; // Thay jobTitle bằng departmentId
     private String position; // Thêm position
     private String residence;
+    private String gender; // Thêm trường giới tính
+    private String hireDate; // Thêm trường ngày vào làm
+    private double salary; // Thêm trường mức lương
+    private byte[] image;
 
     public Employee() {
     }
 
-    public Employee(String firstName, String lastName, String phoneNumber, String email, long departmentId, String position, String residence) {
+    public Employee(String firstName, String lastName, String phoneNumber, String email,
+                    long departmentId, String position, String residence, String gender,
+                    String hireDate, double salary) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
@@ -21,6 +27,9 @@ public class Employee {
         this.departmentId = departmentId;
         this.position = position;
         this.residence = residence;
+        this.gender = gender;
+        this.hireDate = hireDate;
+        this.salary = salary;
     }
 
     public long getId() {
@@ -86,4 +95,37 @@ public class Employee {
     public void setResidence(String residence) {
         this.residence = residence;
     }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getHireDate() {
+        return hireDate;
+    }
+
+    public void setHireDate(String hireDate) {
+        this.hireDate = hireDate;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    public void setSalary(double salary) {
+        this.salary = salary;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
 }

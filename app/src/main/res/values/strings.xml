@@ -47,6 +47,12 @@
     <string name="department_hint">Select a Department</string>
     <string name="position_hint">Select a Position</string>
     <string name="residence_hint">Enter the Residence</string>
+    <string name="gender_title">Gender</string>
+    <string name="gender_hint">Choose gender</string>
+    <string name="hire_date_title">Hire date</string>
+    <string name="hire_date_hint">Enter the hire date(EX: 2025-05-19)</string>
+    <string name="salary_title">Salary</string>
+    <string name="salary_hint">Enter the salary</string>
 
     <!-- Department -->
     <string name="department_list">List of Departments</string>
@@ -135,5 +141,12 @@
     <string name="deleted_failed">Failed to delete</string>
     <string name="search">Search …</string>
 
+
+
+    <string-array name="gender_options">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Other</item>
+    </string-array>
 
 </resources>

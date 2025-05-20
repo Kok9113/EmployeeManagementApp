@@ -3,10 +3,13 @@ package com.example.employeemanagementapp.adapter.employee;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.employeemanagementapp.R;
@@ -34,6 +37,7 @@ public class EmployeeListAdapter extends ArrayAdapter<Employee> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.list_item_layout, parent, false);
         }
 
+        ImageView profileImageView = convertView.findViewById(R.id.image_profile);
         TextView firstLastNameTextView = convertView.findViewById(R.id.text_name);
         TextView jobTitleTextView = convertView.findViewById(R.id.text_job);
 
@@ -48,6 +52,14 @@ public class EmployeeListAdapter extends ArrayAdapter<Employee> {
         }
 
         jobTitleTextView.setText(departmentName + " - " + employee.getPosition());
+
+        byte[] imageBytes = employee.getImage(); // giả sử bạn có getter getImage() trả về byte[]
+        if (imageBytes != null && imageBytes.length > 0) {
+            Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+            profileImageView.setImageBitmap(bitmap);
+        } else {
+            profileImageView.setImageResource(R.drawable.ic_launcher_background); // ảnh mặc định khi chưa có ảnh
+        }
 
         return convertView;
     }
