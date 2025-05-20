@@ -141,6 +141,8 @@
     <string name="delete_message">Bạn có chắc chắn muốn xóa không?</string>
     <string name="deleted_success">Xóa thành công</string>
     <string name="deleted_failed">Xóa thất bại</string>
+    <string name="update_success">Cập nhật thành công</string>
+    <string name="update_failed">Cập nhật thất bại</string>
     <string name="search">Tìm kiếm …</string>
 
 

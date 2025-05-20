@@ -429,9 +429,9 @@ public class EmployeeDetails extends AppCompatActivity {
                     selectedDepartmentId, position, residence, gender, hireDate, salary);
             int rowsAffected = employeeDAO.updateEmployee(employeeId, employee, imageBytes);
             if (rowsAffected > 0) {
-                Toast.makeText(this, "Cập nhật nhân viên thành công", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "Cập nhật nhân viên thất bại", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.update_failed, Toast.LENGTH_SHORT).show();
             }
         } else {
             Log.d("Update Employee", "ID nhân viên không hợp lệ");

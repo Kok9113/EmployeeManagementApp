@@ -81,6 +81,9 @@ public class MainActivity extends AppCompatActivity {
     private boolean isMenuOpen = false;
     private long selectedDeptId = -1; // -1 means all departments
 
+    private LinearLayout llUser, llDepartment, llRole, llPermission;
+
+    private Button btnAddEmployee;
     private BroadcastReceiver languageChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -104,17 +107,26 @@ public class MainActivity extends AppCompatActivity {
         // Đăng ký BroadcastReceiver với ContextCompat
         IntentFilter filter = new IntentFilter("LANGUAGE_CHANGED");
         ContextCompat.registerReceiver(this, languageChangeReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
-        searchInput = findViewById(R.id.search_input);
 
         departmentDAO = new DepartmentDAO(this);
         departmentMap = new HashMap<>();
-        loadDepartments();
 
+        searchInput = findViewById(R.id.search_input);
         listView = findViewById(R.id.listview);
         gridLayout = findViewById(R.id.gridlayout);
         noEmployeesText = findViewById(R.id.text_no_employees);
         headerTitle = findViewById(R.id.text_employee_list);
         menuPanel = findViewById(R.id.menu_panel);
+        imageMenu = findViewById(R.id.image_menu);
+        imageSortDepartment = findViewById(R.id.image_sort_department);
+        overlay = findViewById(R.id.overlay);
+
+        llUser = findViewById(R.id.btn_user);
+        llDepartment = findViewById(R.id.menu_departments);
+        llRole = findViewById(R.id.btn_role);
+        llPermission = findViewById(R.id.menu_permission);
+
+        btnAddEmployee = findViewById(R.id.button_add_employee);
 
         if (listView == null || gridLayout == null) {
             Log.e("MainActivity", "ListView or GridLayout not found in layout");
@@ -123,13 +135,34 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        displayEmployees();
-
         SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
         int userId = sharedPreferences.getInt("authUserId", -1);
         if (userId != -1) {
-            if (!userDAO.userHasPermission(userId, "SEARCH")) {
+            if (!userDAO.userHasPermission(userId, Constants.VIEW_USER)) {
+                llUser.setVisibility(View.GONE);
+            }
+
+            if (!userDAO.userHasPermission(userId, Constants.VIEW_DEPARTMENT)) {
+                llDepartment.setVisibility(View.GONE);
+            }
+
+            if (!userDAO.userHasPermission(userId, Constants.VIEW_ROLE)) {
+                llRole.setVisibility(View.GONE);
+            }
+
+            if (!userDAO.userHasPermission(userId, Constants.VIEW_PERMISSION)) {
+                llPermission.setVisibility(View.GONE);
+            }
+
+            if (!userDAO.userHasPermission(userId, Constants.VIEW_EMPLOYEE)) {
+                btnAddEmployee.setVisibility(View.GONE);
                 searchInput.setVisibility(View.GONE);
+                imageSortDepartment.setVisibility(View.GONE);
+            }
+
+            if (userDAO.userHasPermission(userId, Constants.VIEW_EMPLOYEE)) {
+                displayEmployees();
+                loadDepartments();
             }
         }
 
@@ -144,10 +177,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {}
         });
-
-        imageMenu = findViewById(R.id.image_menu);
-        imageSortDepartment = findViewById(R.id.image_sort_department);
-        overlay = findViewById(R.id.overlay);
 
         imageMenu.setOnClickListener(v -> {
             if (isMenuOpen) {
@@ -170,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.button_add_employee).setOnClickListener(new View.OnClickListener() {
+        btnAddEmployee.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
@@ -198,10 +227,16 @@ public class MainActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         applyLanguage();
-        departmentMap.clear();
-        loadDepartments();
-        displayEmployees();
-        updateHeaderTitle();
+        SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
+        int userId = sharedPreferences.getInt("authUserId", -1);
+        if (userId != -1) {
+            if (userDAO.userHasPermission(userId, Constants.VIEW_EMPLOYEE)) {
+                departmentMap.clear();
+                loadDepartments();
+                displayEmployees();
+                updateHeaderTitle();
+            }
+        }
     }
 
     @Override

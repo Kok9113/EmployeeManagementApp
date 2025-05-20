@@ -39,6 +39,7 @@
         android:layout_marginTop="220dp"
         app:cardCornerRadius="24dp"
         app:cardElevation="8dp"
+        android:background="#FFFFFF"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -47,6 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:background="#FFFFFF"
             android:padding="24dp">
 
             <!-- Tiêu đề -->
@@ -72,6 +74,7 @@
                 android:drawableStart="@drawable/ic_user"
                 android:drawablePadding="12dp"
                 android:paddingStart="16dp"
+                android:textColorHint="@color/grey"
                 android:paddingEnd="16dp"/>
 
             <!-- Mật khẩu -->
@@ -86,6 +89,7 @@
                 android:drawableStart="@drawable/ic_password"
                 android:drawablePadding="12dp"
                 android:paddingStart="16dp"
+                android:textColorHint="@color/grey"
                 android:paddingEnd="16dp"/>
 
             <!-- Nút đăng nhập -->

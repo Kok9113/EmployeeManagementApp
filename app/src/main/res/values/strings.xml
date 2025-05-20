@@ -139,7 +139,9 @@
     <string name="not_found">Not found</string>
     <string name="delete_message">Are you sure you want to delete ?</string>
     <string name="deleted_success">Deleted successfully</string>
-    <string name="deleted_failed">Failed to delete</string>
+    <string name="deleted_failed">Failed delete</string>
+    <string name="update_success">Update successfully</string>
+    <string name="update_failed">Update failed</string>
     <string name="search">Search …</string>
 
 
