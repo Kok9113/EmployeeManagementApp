@@ -411,6 +411,17 @@ public class EmployeeDetails extends AppCompatActivity {
                 Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            if (!phoneNumber.matches("\\d{10}")) {
+                Toast.makeText(this, "Số điện thoại phải gồm đúng 10 số", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (!isValidEmail(email)) {
+                Toast.makeText(this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (imageBytes == null) {
                 Toast.makeText(this, "Không thể xử lý ảnh hồ sơ", Toast.LENGTH_SHORT).show();
                 return;
@@ -436,6 +447,11 @@ public class EmployeeDetails extends AppCompatActivity {
         } else {
             Log.d("Update Employee", "ID nhân viên không hợp lệ");
         }
+    }
+
+
+    private boolean isValidEmail(String email) {
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private void applyLanguage() {

@@ -11,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -267,6 +268,14 @@ public class AddEmployeeActivity extends AppCompatActivity {
                 residence.isEmpty() || selectedDepartmentId == -1 || position.isEmpty() ||
                 gender.isEmpty() || hireDate.isEmpty() || salaryStr.isEmpty()) {
             Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!phoneNumber.matches("\\d{10}")) {
+            Toast.makeText(this, "Số điện thoại phải gồm đúng 10 số", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
             return;
         }
         if (imageBytes == null) {
