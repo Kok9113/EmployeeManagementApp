@@ -2,8 +2,11 @@ package com.example.employeemanagementapp.ui.user;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +18,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     EditText emailField, passwordField1, passwordField2;
     Button btnRegister, btnBack;
+    ImageView btnTogglePassword2, btnTogglePassword3;
+
+    boolean isPasswordVisible1 = false;
+    boolean isPasswordVisible2 = false;
 
     UserDAO userDAO;
 
@@ -29,7 +36,34 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.dang_ky2);
         btnBack = findViewById(R.id.quay_lai);
 
+        btnTogglePassword2 = findViewById(R.id.btnTogglePassword2);
+        btnTogglePassword3 = findViewById(R.id.btnTogglePassword3);
+
         userDAO = new UserDAO(this); // Khởi tạo SQLite helper
+
+        btnTogglePassword2.setOnClickListener(v -> {
+            if (isPasswordVisible1) {
+                passwordField1.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                btnTogglePassword2.setImageResource(R.drawable.ic_eye_closed);
+            } else {
+                passwordField1.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                btnTogglePassword2.setImageResource(R.drawable.ic_eye_open);
+            }
+            isPasswordVisible1 = !isPasswordVisible1;
+            passwordField1.setSelection(passwordField1.getText().length());
+        });
+
+        btnTogglePassword3.setOnClickListener(v -> {
+            if (isPasswordVisible2) {
+                passwordField2.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                btnTogglePassword3.setImageResource(R.drawable.ic_eye_closed);
+            } else {
+                passwordField2.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                btnTogglePassword3.setImageResource(R.drawable.ic_eye_open);
+            }
+            isPasswordVisible2 = !isPasswordVisible2;
+            passwordField2.setSelection(passwordField2.getText().length());
+        });
 
         btnRegister.setOnClickListener(v -> {
             String username = emailField.getText().toString().trim();

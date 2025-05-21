@@ -78,6 +78,10 @@
                 android:paddingEnd="16dp"/>
 
             <!-- Mật khẩu -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
             <EditText
                 android:id="@+id/editTextNumberPassword"
                 android:layout_width="match_parent"
@@ -91,6 +95,16 @@
                 android:paddingStart="16dp"
                 android:textColorHint="@color/grey"
                 android:paddingEnd="16dp"/>
+                <ImageView
+                    android:id="@+id/btnTogglePassword"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:layout_marginTop="7.2dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/ic_eye_closed"
+                    android:contentDescription="Hiện/ẩn mật khẩu"/>
+            </FrameLayout>
 
             <!-- Nút đăng nhập -->
             <Button

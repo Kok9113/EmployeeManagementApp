@@ -19,8 +19,8 @@
     <string name="menu_departments">Phòng ban</string>
     <string name="menu_settings">Cài đặt</string>
     <string name="menu_user">Người dùng</string>
-    <string name="menu_role">Role</string>
-    <string name="menu_permission">Permission</string>
+    <string name="menu_role">Vai trò</string>
+    <string name="menu_permission">Phân quyền</string>
 
     <string name="menu_logout">Đăng xuất</string>
 

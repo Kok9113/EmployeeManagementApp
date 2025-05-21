@@ -560,6 +560,7 @@ public class MainActivity extends AppCompatActivity {
             LinearLayout userLayout = menuPanel.findViewById(R.id.btn_user);
             LinearLayout roleLayout = menuPanel.findViewById(R.id.btn_role);
             LinearLayout logoutLayout = menuPanel.findViewById(R.id.menu_logout);
+            LinearLayout permissionLayout = menuPanel.findViewById(R.id.menu_permission);
 
 
             // Tìm TextView bên trong LinearLayout
@@ -589,9 +590,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (logoutLayout != null) {
-                TextView usersText = logoutLayout.findViewById(R.id.text_logout);
-                if (usersText != null) {
-                    usersText.setText(getString(R.string.menu_logout));
+                TextView logoutText = logoutLayout.findViewById(R.id.text_logout);
+                if (logoutText != null) {
+                    logoutText.setText(getString(R.string.menu_logout));
+                }
+            }
+            if (permissionLayout != null) {
+                TextView permissionText = permissionLayout.findViewById(R.id.text_permission);
+                if (permissionText != null) {
+                    permissionText.setText(getString(R.string.menu_permission));
                 }
             }
         }

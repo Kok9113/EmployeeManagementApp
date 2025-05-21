@@ -77,6 +77,14 @@ public class EditUserActivity extends AppCompatActivity {
                 selectedRole = null;
             }
         });
+
+        ImageView backIcon = findViewById(R.id.image_back);
+        backIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     public void updateUser(View view) {
