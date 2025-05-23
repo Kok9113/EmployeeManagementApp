@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -30,6 +31,7 @@ import com.example.employeemanagementapp.R;
 import com.example.employeemanagementapp.db.DatabaseHelper;
 import com.example.employeemanagementapp.db.dao.DepartmentDAO;
 import com.example.employeemanagementapp.db.dao.EmployeeDAO;
+import com.example.employeemanagementapp.db.dao.UserDAO;
 import com.example.employeemanagementapp.db.model.Employee;
 import com.example.employeemanagementapp.utils.Constants;
 
@@ -51,6 +53,10 @@ public class EmployeeDetails extends AppCompatActivity {
     private Spinner spinnerDepartment, spinnerPosition, spinnerGender;
     private List<Department> departments;
     private long selectedDepartmentId;
+    private ImageView iconUpdate, iconDelete;
+    private Button btnUpdate;
+
+    private UserDAO userDAO;
 
     private static class Department {
         long id;
@@ -73,6 +79,8 @@ public class EmployeeDetails extends AppCompatActivity {
         employeeDAO = new EmployeeDAO(this);
         departmentDAO = new DepartmentDAO(this);
 
+        userDAO = new UserDAO(this);
+
         editTextFirstName = findViewById(R.id.edittext_first_name);
         editTextLastName = findViewById(R.id.edittext_last_name);
         editTextPhoneNumber = findViewById(R.id.edittext_phone_number);
@@ -84,6 +92,10 @@ public class EmployeeDetails extends AppCompatActivity {
         spinnerPosition = findViewById(R.id.spinner_position);
         spinnerGender = findViewById(R.id.spinner_gender);
         profileImageView = findViewById(R.id.image_profile2);
+
+        iconUpdate = findViewById(R.id.modiff);
+        iconDelete = findViewById(R.id.supp);
+        btnUpdate = findViewById(R.id.btn_update);
 
         // Thiết lập Spinner giới tính
         ArrayAdapter<CharSequence> genderAdapter = ArrayAdapter.createFromResource(
@@ -195,6 +207,19 @@ public class EmployeeDetails extends AppCompatActivity {
                 updatePositionSpinner(new String[]{});
             }
         });
+
+        SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
+        int userId = sharedPreferences.getInt("authUserId", -1);
+        if (userId != -1) {
+            if (!userDAO.userHasPermission(userId, Constants.EDIT_EMPLOYEE)) {
+                iconUpdate.setVisibility(View.GONE);
+                btnUpdate.setVisibility(View.GONE);
+            }
+
+            if (!userDAO.userHasPermission(userId, Constants.DELETE_EMPLOYEE)) {
+                iconDelete.setVisibility(View.GONE);
+            }
+        }
     }
 
     private void showDatePickerDialog() {

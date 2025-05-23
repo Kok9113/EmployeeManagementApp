@@ -20,8 +20,11 @@ public class Constants {
     public static final String VIEW_ROLE = "VIEW_ROLE";
     public static final String VIEW_USER = "VIEW_USER";
     public static final String VIEW_PERMISSION = "VIEW_PERMISSION";
-    public static final String VIEW_EMPLOYEE = "VIEW_EMPLOYEE";
     public static final String VIEW_DEPARTMENT = "VIEW_DEPARTMENT";
+    public static final String VIEW_EMPLOYEE = "VIEW_EMPLOYEE";
+    public static final String ADD_EMPLOYEE = "ADD_EMPLOYEE";
+    public static final String EDIT_EMPLOYEE = "EDIT_EMPLOYEE";
+    public static final String DELETE_EMPLOYEE = "DELETE_EMPLOYEE";
 
     // Cột trong bảng users
     public static final String COLUMN_USER_ID = "user_id";

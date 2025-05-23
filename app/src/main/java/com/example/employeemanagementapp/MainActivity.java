@@ -155,9 +155,12 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (!userDAO.userHasPermission(userId, Constants.VIEW_EMPLOYEE)) {
-                btnAddEmployee.setVisibility(View.GONE);
                 searchInput.setVisibility(View.GONE);
                 imageSortDepartment.setVisibility(View.GONE);
+            }
+
+            if (!userDAO.userHasPermission(userId, Constants.ADD_EMPLOYEE)) {
+                btnAddEmployee.setVisibility(View.GONE);
             }
 
             if (userDAO.userHasPermission(userId, Constants.VIEW_EMPLOYEE)) {
