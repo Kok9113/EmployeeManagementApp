@@ -9,6 +9,7 @@
         android:id="@+id/text_dept_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:color="@color/colorWhite"
         android:textSize="16sp"
         android:textStyle="bold"
         />

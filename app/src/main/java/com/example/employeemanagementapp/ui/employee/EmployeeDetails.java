@@ -310,7 +310,7 @@ public class EmployeeDetails extends AppCompatActivity {
 
     private void setEditTextEditable(EditText editText) {
         editText.setFocusableInTouchMode(true);
-        editText.setTextColor(getResources().getColor(android.R.color.black));
+        editText.setTextColor(getResources().getColor(R.color.colorWhite));
     }
 
     public byte[] convertImageToByteArray() {
@@ -434,7 +434,6 @@ public class EmployeeDetails extends AppCompatActivity {
             String gender = spinnerGender.getSelectedItem() != null ? spinnerGender.getSelectedItem().toString() : "";
             String hireDate = editTextHireDate.getText().toString();
             String salaryStr = editTextSalary.getText().toString();
-            byte[] imageBytes = convertImageToByteArray();
 
             if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) ||
                     TextUtils.isEmpty(phoneNumber) || TextUtils.isEmpty(email) ||
@@ -453,10 +452,7 @@ public class EmployeeDetails extends AppCompatActivity {
                 Toast.makeText(this, getString(R.string.invalid_email), Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (imageBytes == null) {
-                Toast.makeText(this, getString(R.string.image_processing_failed), Toast.LENGTH_SHORT).show();
-                return;
-            }
+
 
             // Chuyển đổi mức lương
             double salary;
@@ -464,6 +460,12 @@ public class EmployeeDetails extends AppCompatActivity {
                 salary = Double.parseDouble(salaryStr);
             } catch (NumberFormatException e) {
                 Toast.makeText(this, getString(R.string.invalid_salary), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            byte[] imageBytes = convertImageToByteArray();
+            if (imageBytes == null) {
+                Toast.makeText(this, getString(R.string.image_processing_failed), Toast.LENGTH_SHORT).show();
                 return;
             }
 
