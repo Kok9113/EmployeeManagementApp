@@ -145,6 +145,22 @@
     <string name="update_failed">Cập nhật thất bại</string>
     <string name="search">Tìm kiếm …</string>
 
+    <string name="delete_confirm_title">Xác nhận xóa</string>
+    <string name="delete_confirm_message">Bạn có chắc chắn muốn xóa nhân viên này không?</string>
+    <string name="delete_positive">Xóa</string>
+    <string name="delete_negative">Hủy</string>
+    <string name="delete_success">Đã xóa nhân viên thành công</string>
+    <string name="delete_failure">Xóa nhân viên thất bại</string>
+
+    <string name="invalid_phone">Số điện thoại phải gồm đúng 10 số</string>
+    <string name="invalid_email">Email không hợp lệ</string>
+    <string name="image_processing_failed">Xử lý ảnh đại diện thất bại</string>
+    <string name="invalid_salary">Mức lương không hợp lệ</string>
+    <string name="employee_add_failed">Thêm nhân viên thất bại</string>
+    <string name="delete_confirmation">Bạn có chắc chắn muốn xóa không?</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="gender_options">Giới tính</string>
+
 
     <string-array name="gender_options">
         <item>Nam</item>

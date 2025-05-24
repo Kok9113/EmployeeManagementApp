@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -373,20 +374,27 @@ public class EmployeeDetails extends AppCompatActivity {
     }
 
     public void deleteEmployee(View view) {
-        long employeeId = getIntent().getLongExtra("employeeId", -1);
-        if (employeeId != -1) {
-            int rowsDeleted = employeeDAO.deleteEmployee(employeeId);
-            if (rowsDeleted > 0) {
-                Toast.makeText(this, "Employee deleted successfully", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-            } else {
-                Toast.makeText(this, "Failed to delete employee", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            Log.d("Delete Employee", "Invalid employee ID");
-        }
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(getString(R.string.delete_confirm_title))
+                .setMessage(getString(R.string.delete_confirm_message))
+                .setPositiveButton(getString(R.string.delete_positive), (dialog, which) -> {
+                    long employeeId = getIntent().getLongExtra("employeeId", -1);
+                    if (employeeId != -1) {
+                        int rowsDeleted = employeeDAO.deleteEmployee(employeeId);
+                        if (rowsDeleted > 0) {
+                            Toast.makeText(this, "Đã xóa nhân viên thành công", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(this, MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                        } else {
+                            Toast.makeText(this, getString(R.string.delete_success), Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Log.d("Delete Employee", "ID nhân viên không hợp lệ");
+                    }
+                })
+                .setNegativeButton(getString(R.string.delete_negative), (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     public void updateEmployee(View view) {
@@ -413,17 +421,15 @@ public class EmployeeDetails extends AppCompatActivity {
             }
 
             if (!phoneNumber.matches("\\d{10}")) {
-                Toast.makeText(this, "Số điện thoại phải gồm đúng 10 số", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.invalid_phone), Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            if (!isValidEmail(email)) {
-                Toast.makeText(this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                Toast.makeText(this, getString(R.string.invalid_email), Toast.LENGTH_SHORT).show();
                 return;
             }
-
             if (imageBytes == null) {
-                Toast.makeText(this, "Không thể xử lý ảnh hồ sơ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.image_processing_failed), Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -432,7 +438,7 @@ public class EmployeeDetails extends AppCompatActivity {
             try {
                 salary = Double.parseDouble(salaryStr);
             } catch (NumberFormatException e) {
-                Toast.makeText(this, "Mức lương không hợp lệ", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.invalid_salary), Toast.LENGTH_SHORT).show();
                 return;
             }
 

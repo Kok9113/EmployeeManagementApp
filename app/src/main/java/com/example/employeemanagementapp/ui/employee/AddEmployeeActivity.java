@@ -271,22 +271,22 @@ public class AddEmployeeActivity extends AppCompatActivity {
             return;
         }
         if (!phoneNumber.matches("\\d{10}")) {
-            Toast.makeText(this, "Số điện thoại phải gồm đúng 10 số", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.invalid_phone), Toast.LENGTH_SHORT).show();
             return;
         }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            Toast.makeText(this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.invalid_email), Toast.LENGTH_SHORT).show();
             return;
         }
         if (imageBytes == null) {
-            Toast.makeText(this, "Failed to process profile image", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.image_processing_failed), Toast.LENGTH_SHORT).show();
             return;
         }
         double salary;
         try {
             salary = Double.parseDouble(salaryStr);
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "Mức lương không hợp lệ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.invalid_salary), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -295,10 +295,10 @@ public class AddEmployeeActivity extends AppCompatActivity {
         long result = employeeDAO.insertEmployee(employee, imageBytes);
 
         if (result != -1) {
-            Toast.makeText(this, "Employee added successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.employee_added_success), Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            Toast.makeText(this, "Failed to add employee", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.employee_add_failed), Toast.LENGTH_SHORT).show();
         }
     }
 
