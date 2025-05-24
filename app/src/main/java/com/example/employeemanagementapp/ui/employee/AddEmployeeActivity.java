@@ -262,7 +262,6 @@ public class AddEmployeeActivity extends AppCompatActivity {
         String gender = spinnerGender.getSelectedItem() != null ? spinnerGender.getSelectedItem().toString() : "";
         String hireDate = editTextHireDate.getText().toString().trim();
         String salaryStr = editTextSalary.getText().toString().trim();
-        byte[] imageBytes = convertImageToByteArray();
 
         if (firstName.isEmpty() || lastName.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() ||
                 residence.isEmpty() || selectedDepartmentId == -1 || position.isEmpty() ||
@@ -278,15 +277,18 @@ public class AddEmployeeActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.invalid_email), Toast.LENGTH_SHORT).show();
             return;
         }
-        if (imageBytes == null) {
-            Toast.makeText(this, getString(R.string.image_processing_failed), Toast.LENGTH_SHORT).show();
-            return;
-        }
+
         double salary;
         try {
             salary = Double.parseDouble(salaryStr);
         } catch (NumberFormatException e) {
             Toast.makeText(this, getString(R.string.invalid_salary), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        byte[] imageBytes = convertImageToByteArray();
+        if (imageBytes == null) {
+            Toast.makeText(this, getString(R.string.image_processing_failed), Toast.LENGTH_SHORT).show();
             return;
         }
 
