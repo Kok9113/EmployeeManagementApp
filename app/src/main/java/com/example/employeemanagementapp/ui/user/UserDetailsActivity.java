@@ -43,7 +43,7 @@ public class UserDetailsActivity extends AppCompatActivity {
 
         userId = getIntent().getIntExtra("userId", -1);
         if (userId == -1) {
-            Toast.makeText(this, "Không tìm thấy người dùng", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.not_found, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }

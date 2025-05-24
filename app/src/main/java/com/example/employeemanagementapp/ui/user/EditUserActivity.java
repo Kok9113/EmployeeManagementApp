@@ -44,7 +44,7 @@ public class EditUserActivity extends AppCompatActivity {
         currentUser = userDAO.getUserById(userId); // Bạn cần cài đặt hàm này trong UserDAO
 
         if (currentUser == null) {
-            Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.not_found, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -93,7 +93,7 @@ public class EditUserActivity extends AppCompatActivity {
         int newRoleId = selectedRole != null ? selectedRole.getId() : -1;
 
         if (newUsername.isEmpty() || newPassword.isEmpty()) {
-            Toast.makeText(this, "Username and Password cannot be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.username_pasword_notempty, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -104,11 +104,11 @@ public class EditUserActivity extends AppCompatActivity {
         int updateResult = userDAO.updateUser(currentUser);
 
         if (updateResult > 0) {
-            Toast.makeText(this, "User updated successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);
             finish();
         } else {
-            Toast.makeText(this, "Failed to update user", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.update_failed, Toast.LENGTH_SHORT).show();
         }
     }
 }

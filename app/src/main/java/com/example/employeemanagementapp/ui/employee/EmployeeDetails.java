@@ -407,7 +407,7 @@ public class EmployeeDetails extends AppCompatActivity {
                     if (employeeId != -1) {
                         int rowsDeleted = employeeDAO.deleteEmployee(employeeId);
                         if (rowsDeleted > 0) {
-                            Toast.makeText(this, "Đã xóa nhân viên thành công", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, R.string.deleted_success, Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(this, MainActivity.class);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             startActivity(intent);

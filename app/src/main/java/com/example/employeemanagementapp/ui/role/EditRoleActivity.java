@@ -44,7 +44,7 @@ public class EditRoleActivity extends AppCompatActivity {
 
         roleId = getIntent().getLongExtra("roleId", -1);
         if (roleId == -1) {
-            Toast.makeText(this, "Invalid Role ID", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.invalid_id, Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -72,12 +72,12 @@ public class EditRoleActivity extends AppCompatActivity {
         String roleName = edtRoleName.getText().toString().trim();
 
         if (roleName.isEmpty()) {
-            Toast.makeText(this, "Role name cannot be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.role_not_empty, Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (selectedPermissions.isEmpty()) {
-            Toast.makeText(this, "Please select at least one permission", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.please_choose, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -86,11 +86,11 @@ public class EditRoleActivity extends AppCompatActivity {
             List<Long> permissionIds = permissionDAO.getPermissionIdsByNames(selectedPermissions);
             roleDAO.updateRolePermissions(roleId, permissionIds);
 
-            Toast.makeText(this, "Role updated successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);
             finish();
         } else {
-            Toast.makeText(this, "Failed to update role", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.update_failed, Toast.LENGTH_SHORT).show();
         }
     }
 

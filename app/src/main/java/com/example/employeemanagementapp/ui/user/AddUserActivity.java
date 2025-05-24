@@ -79,17 +79,17 @@ public class AddUserActivity extends AppCompatActivity {
         int roleId = selectedRole != null ? selectedRole.getId() : -1;
 
         if (username.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Username and Password cannot be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.username_pasword_notempty, Toast.LENGTH_SHORT).show();
             return;
         }
 
         boolean isRegistered = userDAO.registerUser(username, password, roleId);
         if (isRegistered) {
-            Toast.makeText(this, "User added successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.added_success, Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);
             finish(); // Quay lại trang trước
         } else {
-            Toast.makeText(this, "Failed to add user", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.added_failed, Toast.LENGTH_SHORT).show();
         }
     }
 }

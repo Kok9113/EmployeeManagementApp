@@ -59,12 +59,12 @@ public class AddRoleActivity extends AppCompatActivity {
         String roleName = edtRoleName.getText().toString().trim();
 
         if (roleName.isEmpty()) {
-            Toast.makeText(this, "Role name cannot be empty", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.role_not_empty, Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (selectedPermissions.isEmpty()) {
-            Toast.makeText(this, "Vui lòng chọn ít nhất 1 quyền", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.please_choose, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -75,11 +75,11 @@ public class AddRoleActivity extends AppCompatActivity {
             List<Long> permissionIds = permissionDAO.getPermissionIdsByNames(selectedPermissions);
             roleDAO.insertRolePermissions(newRoleId, permissionIds);
 
-            Toast.makeText(this, "Role added successfully", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.added_success, Toast.LENGTH_SHORT).show();
             setResult(RESULT_OK);
             finish(); // Quay lại trang trước
         } else {
-            Toast.makeText(this, "Failed to add role", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.added_failed, Toast.LENGTH_SHORT).show();
         }
     }
 

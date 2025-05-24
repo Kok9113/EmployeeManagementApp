@@ -69,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
                 String password = passwordEditText.getText().toString();
                 Log.e("a", "a");
                 if (username.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "Vui lòng nhập tên đăng nhập và mật khẩu", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, R.string.username_pasword_notempty, Toast.LENGTH_SHORT).show();
                 } else {
                     boolean isValid = userDAO.checkLogin(username, password);
                     if (isValid) {
@@ -79,12 +79,12 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putInt("authUserId", userId);
                         editor.apply();
 
-                        Toast.makeText(LoginActivity.this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, R.string.login_success, Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         startActivity(intent);
                         finish();
                     } else {
-                        Toast.makeText(LoginActivity.this, "Sai tên đăng nhập hoặc mật khẩu", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this,  R.string.login_failed, Toast.LENGTH_SHORT).show();
                     }
                 }
             }

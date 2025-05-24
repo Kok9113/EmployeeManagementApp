@@ -71,20 +71,20 @@ public class RegisterActivity extends AppCompatActivity {
             String pass2 = passwordField2.getText().toString();
 
             if (username.isEmpty() || pass1.isEmpty() || pass2.isEmpty()) {
-                Toast.makeText(this, "Vui lòng điền đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
             } else if (!pass1.equals(pass2)) {
-                Toast.makeText(this, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.password_not_match, Toast.LENGTH_SHORT).show();
             } else {
                 // Thực hiện đăng ký với SQLite
                 boolean isRegistered = userDAO.registerUser(username, pass1, 0);
                 if (isRegistered) {
-                    Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, R.string.reg_success, Toast.LENGTH_SHORT).show();
                     // Chuyển về LoginActivity
                     Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                     startActivity(intent);
                     finish();
                 } else {
-                    Toast.makeText(this, "Tên đăng nhập đã tồn tại, vui lòng nhập lại", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this,  R.string.reg_failed, Toast.LENGTH_SHORT).show();
                 }
             }
         });

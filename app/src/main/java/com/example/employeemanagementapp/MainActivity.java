@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -130,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (listView == null || gridLayout == null) {
             Log.e("MainActivity", "ListView or GridLayout not found in layout");
-            Toast.makeText(this, "Error: Layout components not found", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.error, Toast.LENGTH_LONG).show();
             finish();
             return;
         }
@@ -499,7 +500,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (Exception e) {
             Log.e("Employee Details", "Error accessing database: " + e.getMessage());
-            Toast.makeText(this, "Error loading employees: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.not_found + e.getMessage(), Toast.LENGTH_LONG).show();
             listView.setVisibility(View.GONE);
             gridLayout.setVisibility(View.GONE);
             if (noEmployeesText != null) {
@@ -648,17 +649,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void GoToLogout(View view) {
-        // Xoá dữ liệu SharedPreferences nếu cần
-        SharedPreferences preferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.clear(); // hoặc editor.remove("key")
-        editor.apply();
+        new AlertDialog.Builder(this)
+            .setTitle(getString(R.string.logout_confirm_title))
+            .setMessage(getString(R.string.logout_confirm_message))
+            .setPositiveButton(getString(R.string.logout_confirm_yes), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    SharedPreferences preferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.clear();
+                    editor.apply();
 
-        // Chuyển về màn hình đăng nhập
-        Intent intent = new Intent(this, LoginActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
+                    Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                }
+            })
+            .setNegativeButton(getString(R.string.logout_confirm_no), null)
+            .show();
     }
 
     // Language

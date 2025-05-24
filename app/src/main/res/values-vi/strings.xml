@@ -138,12 +138,15 @@
     <string name="added_failed">Failed to add</string>
     <string name="invalid_id">ID không hợp lệ</string>
     <string name="not_found">Không tìm thấy</string>
+    <string name="not_empty">Không được để trống</string>
     <string name="delete_message">Bạn có chắc chắn muốn xóa không?</string>
     <string name="deleted_success">Xóa thành công</string>
     <string name="deleted_failed">Xóa thất bại</string>
     <string name="update_success">Cập nhật thành công</string>
     <string name="update_failed">Cập nhật thất bại</string>
     <string name="search">Tìm kiếm …</string>
+    <string name="error">Lỗi: Không tìm thấy giao diện</string>
+
 
     <string name="delete_confirm_title">Xác nhận xóa</string>
     <string name="delete_confirm_message">Bạn có chắc chắn muốn xóa nhân viên này không?</string>
@@ -161,6 +164,20 @@
     <string name="confirm">Xác nhận</string>
     <string name="gender_options">Giới tính</string>
 
+    <string name="role_not_empty">Tên vai trò không được để trống</string>
+    <string name="please_choose">Vui lòng chọn ít nhất 1 quyền</string>
+
+    <string name="username_pasword_notempty">Tài khoản và mật khẩu không được để trống</string>
+    <string name="login_success">Đăng nhập thành công</string>
+    <string name="login_failed">Đăng nhập thất bại</string>
+    <string name="password_not_match">Mật khẩu không khớp</string>
+    <string name="reg_success">Đăng ký thành công</string>
+    <string name="reg_failed">Đăng nhập thất bại</string>
+
+    <string name="logout_confirm_title">Xác nhận đăng xuất</string>
+    <string name="logout_confirm_message">Bạn có chắc chắn muốn đăng xuất?</string>
+    <string name="logout_confirm_yes">Đăng xuất</string>
+    <string name="logout_confirm_no">Huỷ</string>
 
     <string-array name="gender_options">
         <item>Nam</item>
