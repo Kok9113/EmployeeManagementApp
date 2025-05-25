@@ -30,11 +30,14 @@ import com.example.employeemanagementapp.db.model.Employee;
 import com.example.employeemanagementapp.utils.Constants;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class AddEmployeeActivity extends AppCompatActivity {
 
@@ -176,8 +179,9 @@ public class AddEmployeeActivity extends AppCompatActivity {
     }
 
     public byte[] convertImageToByteArray() {
-        final int maxWidth = 800;
-        final int maxHeight = 800;
+        final int maxWidth = 600;  // Giảm từ 800 xuống 600
+        final int maxHeight = 600; // Giảm từ 800 xuống 600
+        final int maxSizeBytes = 500 * 1024; // Giới hạn 500KB
 
         try {
             Bitmap bitmap = null;
@@ -198,15 +202,54 @@ public class AddEmployeeActivity extends AppCompatActivity {
 
             Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
 
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            // Nén JPEG chất lượng 80 để giảm dung lượng
-            resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream);
+            // Nén với chất lượng bắt đầu từ 80%
+            int quality = 80;
+            byte[] imageBytes;
 
-            // Giải phóng bitmap cũ và bitmap resized
-            bitmap.recycle();
+            do {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, quality, stream);
+                imageBytes = stream.toByteArray();
+
+                // Nếu vẫn quá lớn, giảm chất lượng
+                if (imageBytes.length > maxSizeBytes) {
+                    quality -= 10;
+                    if (quality < 30) {
+                        // Nếu chất lượng quá thấp, resize thêm lần nữa
+                        int smallerWidth = (int)(newWidth * 0.8);
+                        int smallerHeight = (int)(newHeight * 0.8);
+                        Bitmap smallerBitmap = Bitmap.createScaledBitmap(resizedBitmap,
+                                smallerWidth, smallerHeight, true);
+                        resizedBitmap.recycle();
+                        resizedBitmap = smallerBitmap;
+                        quality = 60; // Reset quality
+                    }
+                }
+
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    Log.e("AddEmployeeActivity", "Error closing stream: " + e.getMessage());
+                }
+
+            } while (imageBytes.length > maxSizeBytes && quality >= 20);
+
+            // Log kích thước final để debug
+            Log.d("AddEmployeeActivity", "Final image size: " + imageBytes.length + " bytes, quality: " + quality);
+
+            // Giải phóng bitmap
+            if (bitmap != resizedBitmap) {
+                bitmap.recycle();
+            }
             resizedBitmap.recycle();
 
-            return stream.toByteArray();
+            // Kiểm tra cuối cùng
+            if (imageBytes.length > maxSizeBytes) {
+                Log.w("AddEmployeeActivity", "Image still too large: " + imageBytes.length + " bytes");
+                // Có thể return null hoặc throw exception tùy logic app
+            }
+
+            return imageBytes;
 
         } catch (Exception e) {
             Log.e("AddEmployeeActivity", "Error converting image to byte array: " + e.getMessage());
@@ -294,14 +337,19 @@ public class AddEmployeeActivity extends AppCompatActivity {
 
         Employee employee = new Employee(firstName, lastName, phoneNumber, email, selectedDepartmentId,
                 position, residence, gender, hireDate, salary);
-        long result = employeeDAO.insertEmployee(employee, imageBytes);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            long result = employeeDAO.insertEmployee(employee, imageBytes);
 
-        if (result != -1) {
-            Toast.makeText(this, getString(R.string.employee_added_success), Toast.LENGTH_SHORT).show();
-            finish();
-        } else {
-            Toast.makeText(this, getString(R.string.employee_add_failed), Toast.LENGTH_SHORT).show();
-        }
+            runOnUiThread(() -> {
+                if (result != -1) {
+                    Toast.makeText(this, getString(R.string.employee_added_success), Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(this, getString(R.string.employee_add_failed), Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
     }
 
     private void applyLanguage() {

@@ -13,6 +13,8 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -455,15 +457,26 @@ public class MainActivity extends AppCompatActivity {
                             super.bindView(view, context, cursor);
 
                             ImageView imageView = view.findViewById(R.id.image_profile);
-                            int imageIndex = cursor.getColumnIndex(Constants.COLUMN_IMAGE);
-                            if (imageIndex != -1) {
-                                byte[] imageBytes = cursor.getBlob(imageIndex);
-                                if (imageBytes != null && imageBytes.length > 0) {
-                                    Bitmap bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
-                                    imageView.setImageBitmap(bitmap);
-                                } else {
-                                    imageView.setImageResource(R.drawable.ic_launcher_background);
-                                }
+                            int idIndex = cursor.getColumnIndex(Constants.COLUMN_ID); // Giả sử cột ID là COLUMN_ID
+                            if (idIndex != -1) {
+                                long employeeId = cursor.getLong(idIndex);
+                                // Tải ảnh bất đồng bộ trên luồng nền
+                                new Thread(() -> {
+                                    byte[] imageBytes = employeeDAO.getEmployeeProfileImage(employeeId); // Hàm lấy dữ liệu ảnh
+                                    Bitmap bitmap = null;
+                                    if (imageBytes != null && imageBytes.length > 0) {
+                                        bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                                    }
+                                    // Cập nhật UI trên luồng chính
+                                    Bitmap finalBitmap = bitmap;
+                                    new Handler(Looper.getMainLooper()).post(() -> {
+                                        if (finalBitmap != null) {
+                                            imageView.setImageBitmap(finalBitmap);
+                                        } else {
+                                            imageView.setImageResource(R.drawable.ic_launcher_background);
+                                        }
+                                    });
+                                }).start();
                             }
                         }
                     };

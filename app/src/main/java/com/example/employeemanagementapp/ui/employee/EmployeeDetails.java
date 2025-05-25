@@ -42,6 +42,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class EmployeeDetails extends AppCompatActivity {
 
@@ -471,12 +473,19 @@ public class EmployeeDetails extends AppCompatActivity {
 
             Employee employee = new Employee(firstName, lastName, phoneNumber, email,
                     selectedDepartmentId, position, residence, gender, hireDate, salary);
-            int rowsAffected = employeeDAO.updateEmployee(employeeId, employee, imageBytes);
-            if (rowsAffected > 0) {
-                Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, R.string.update_failed, Toast.LENGTH_SHORT).show();
-            }
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            executor.execute(() -> {
+                int rowsAffected = employeeDAO.updateEmployee(employeeId, employee, imageBytes);
+
+                runOnUiThread(() -> {
+                    if (rowsAffected > 0) {
+                        Toast.makeText(this, R.string.update_success, Toast.LENGTH_SHORT).show();
+                        finish(); // đóng màn hình sau khi cập nhật thành công
+                    } else {
+                        Toast.makeText(this, R.string.update_failed, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
         } else {
             Log.d("Update Employee", "ID nhân viên không hợp lệ");
         }
