@@ -56,6 +56,7 @@ public class Constants {
     public static final String COLUMN_POSITION = "employee_position";
     public static final String COLUMN_DEPARTMENT_ID = "department_id";
     public static final String COLUMN_GENDER = "gender";
+    public static final String COLUMN_STATUS = "status";
     public static final String COLUMN_HIRE_DATE = "hire_date";
     public static final String COLUMN_SALARY = "salary";
 

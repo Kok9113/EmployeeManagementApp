@@ -42,7 +42,7 @@ import java.util.concurrent.Executors;
 public class AddEmployeeActivity extends AppCompatActivity {
 
     private EditText editTextFirstName, editTextLastName, editTextPhoneNumber, editTextEmail, editTextResidence;
-    private Spinner spinnerDepartment, spinnerPosition, spinnerGender;
+    private Spinner spinnerDepartment, spinnerPosition, spinnerGender, spinnerStatus;
     private EditText editTextHireDate, editTextSalary;
     private ImageView imageViewValidate, imageViewBack, imageView;
     private EmployeeDAO employeeDAO;
@@ -78,6 +78,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
         spinnerDepartment = findViewById(R.id.spinner_department);
         spinnerPosition = findViewById(R.id.spinner_position);
         spinnerGender = findViewById(R.id.spinner_gender);
+        spinnerStatus = findViewById(R.id.spinner_status);
         imageViewValidate = findViewById(R.id.image_validate);
         imageViewBack = findViewById(R.id.image_back);
         imageView = findViewById(R.id.image_profile);
@@ -91,6 +92,13 @@ public class AddEmployeeActivity extends AppCompatActivity {
                 this, R.array.gender_options, android.R.layout.simple_spinner_item);
         genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(genderAdapter);
+
+        // Thiết lập Spinner trạng thái
+        ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(
+                this, R.array.employment_status_options, android.R.layout.simple_spinner_item);
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerStatus.setAdapter(statusAdapter);
+
 
         // Thiết lập DatePicker cho ngày vào làm
         editTextHireDate.setOnClickListener(v -> showDatePickerDialog());
@@ -303,12 +311,13 @@ public class AddEmployeeActivity extends AppCompatActivity {
         String residence = editTextResidence.getText().toString().trim();
         String position = spinnerPosition.getSelectedItem() != null ? spinnerPosition.getSelectedItem().toString() : "";
         String gender = spinnerGender.getSelectedItem() != null ? spinnerGender.getSelectedItem().toString() : "";
+        String status = spinnerGender.getSelectedItem() != null ? spinnerStatus.getSelectedItem().toString() : "";
         String hireDate = editTextHireDate.getText().toString().trim();
         String salaryStr = editTextSalary.getText().toString().trim();
 
         if (firstName.isEmpty() || lastName.isEmpty() || phoneNumber.isEmpty() || email.isEmpty() ||
                 residence.isEmpty() || selectedDepartmentId == -1 || position.isEmpty() ||
-                gender.isEmpty() || hireDate.isEmpty() || salaryStr.isEmpty()) {
+                gender.isEmpty() || status.isEmpty() || hireDate.isEmpty() || salaryStr.isEmpty()) {
             Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -336,7 +345,7 @@ public class AddEmployeeActivity extends AppCompatActivity {
         }
 
         Employee employee = new Employee(firstName, lastName, phoneNumber, email, selectedDepartmentId,
-                position, residence, gender, hireDate, salary);
+                position, residence, gender,status, hireDate, salary);
         ExecutorService executor = Executors.newSingleThreadExecutor();
         executor.execute(() -> {
             long result = employeeDAO.insertEmployee(employee, imageBytes);

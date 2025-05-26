@@ -16,6 +16,8 @@
     <color name="colorWhite">#ffffff</color>
     <color name="backgroundGray">#7D5BA6</color>
 
-
+    <color name="status_active">#007608</color>
+    <color name="status_inactive">#FF2222</color>
+    <color name="status_maternity">#CC7A96</color>
 
 </resources>

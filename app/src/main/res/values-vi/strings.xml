@@ -50,6 +50,7 @@
     <string name="residence_hint">Nhập địa chỉ</string>
     <string name="gender_title">Giới tính</string>
     <string name="gender_hint">Chọn giới tính</string>
+    <string name="status_title">Trạng thái</string>
     <string name="hire_date_title">Ngày vào làm</string>
     <string name="hire_date_hint">Nhập ngày vào làm (VD: 2025-05-19)</string>
     <string name="salary_title">Mức lương</string>
@@ -183,6 +184,12 @@
         <item>Nam</item>
         <item>Nữ</item>
         <item>Khác</item>
+    </string-array>
+
+    <string-array name="employment_status_options">
+        <item>Đang làm việc</item>
+        <item>Đã Nghỉ</item>
+        <item>Đang nghỉ thai sản</item>
     </string-array>
 
 </resources>

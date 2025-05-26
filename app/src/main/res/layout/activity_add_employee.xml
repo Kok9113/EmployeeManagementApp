@@ -188,6 +188,22 @@
                 android:layout_marginLeft="20sp"
                 android:layout_marginTop="20sp"
                 android:textSize="17sp"
+                android:text="@string/status_title" />
+
+            <Spinner
+                android:id="@+id/spinner_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="20sp"
+                android:background="@drawable/edittext_border"
+                android:padding="15sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20sp"
+                android:layout_marginTop="20sp"
+                android:textSize="17sp"
                 android:text="@string/department_title" />
 
             <Spinner
@@ -270,6 +286,8 @@
                 android:layout_marginBottom="120sp"
                 android:padding="15sp"
                 android:background="@drawable/edittext_border" />
+
+
 
         </LinearLayout>
 

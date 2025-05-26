@@ -10,7 +10,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.util.Log;
-import android.view.View;
 
 import com.example.employeemanagementapp.db.DatabaseHelper;
 import com.example.employeemanagementapp.db.model.Employee;
@@ -37,6 +36,7 @@ public class EmployeeDAO {
         values.put(Constants.COLUMN_DEPARTMENT_ID, emp.getDepartmentId());
         values.put(Constants.COLUMN_POSITION, emp.getPosition());
         values.put(Constants.COLUMN_GENDER, emp.getGender()); // Thêm giới tính
+        values.put(Constants.COLUMN_STATUS, emp.getStatus());
         values.put(Constants.COLUMN_HIRE_DATE, emp.getHireDate()); // Thêm ngày vào làm
         values.put(Constants.COLUMN_SALARY, emp.getSalary()); // Thêm mức lương
         return db.insert(Constants.TABLE_EMPLOYEE, null, values);
@@ -53,6 +53,7 @@ public class EmployeeDAO {
         values.put(Constants.COLUMN_DEPARTMENT_ID, emp.getDepartmentId());
         values.put(Constants.COLUMN_POSITION, emp.getPosition());
         values.put(Constants.COLUMN_GENDER, emp.getGender()); // Thêm giới tính
+        values.put(Constants.COLUMN_STATUS, emp.getStatus());
         values.put(Constants.COLUMN_HIRE_DATE, emp.getHireDate()); // Thêm ngày vào làm
         values.put(Constants.COLUMN_SALARY, emp.getSalary()); // Thêm mức
         return db.update(Constants.TABLE_EMPLOYEE, values, Constants.COLUMN_ID + "=?", new String[]{String.valueOf(id)});
@@ -87,6 +88,7 @@ public class EmployeeDAO {
                         Constants.COLUMN_FIRST_NAME + ", " +
                         Constants.COLUMN_LAST_NAME + ", " +
                         Constants.COLUMN_POSITION + ", " +
+                        Constants.COLUMN_STATUS + ", " +
 //                        Constants.COLUMN_IMAGE + ", " +
                         Constants.COLUMN_DEPARTMENT_ID +
                         " FROM " + Constants.TABLE_EMPLOYEE,
@@ -105,6 +107,7 @@ public class EmployeeDAO {
                 Constants.COLUMN_POSITION,
                 Constants.COLUMN_DEPARTMENT_ID,
                 Constants.COLUMN_GENDER,
+                Constants.COLUMN_STATUS,
                 Constants.COLUMN_HIRE_DATE,
                 Constants.COLUMN_SALARY
         };

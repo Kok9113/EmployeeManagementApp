@@ -53,7 +53,7 @@ public class EmployeeDetails extends AppCompatActivity {
     private ImageView profileImageView;
     private EditText editTextFirstName, editTextLastName, editTextPhoneNumber, editTextEmail, editTextResidence;
     private EditText editTextHireDate, editTextSalary;
-    private Spinner spinnerDepartment, spinnerPosition, spinnerGender;
+    private Spinner spinnerDepartment, spinnerPosition, spinnerGender, spinnerStatus;
     private List<Department> departments;
     private long selectedDepartmentId;
     private ImageView iconUpdate, iconDelete;
@@ -94,6 +94,7 @@ public class EmployeeDetails extends AppCompatActivity {
         spinnerDepartment = findViewById(R.id.spinner_department);
         spinnerPosition = findViewById(R.id.spinner_position);
         spinnerGender = findViewById(R.id.spinner_gender);
+        spinnerStatus = findViewById(R.id.spinner_status);
         profileImageView = findViewById(R.id.image_profile2);
 
         iconUpdate = findViewById(R.id.modiff);
@@ -105,6 +106,11 @@ public class EmployeeDetails extends AppCompatActivity {
                 this, R.array.gender_options, android.R.layout.simple_spinner_item);
         genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(genderAdapter);
+
+        ArrayAdapter<CharSequence> statusAdapter = ArrayAdapter.createFromResource(
+                this, R.array.employment_status_options, android.R.layout.simple_spinner_item);
+        statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerStatus.setAdapter(statusAdapter);
 
         // Thiết lập DatePicker cho ngày vào làm
         editTextHireDate.setOnClickListener(v -> {
@@ -127,6 +133,7 @@ public class EmployeeDetails extends AppCompatActivity {
                 @SuppressLint("Range") long departmentId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_DEPARTMENT_ID));
                 @SuppressLint("Range") String position = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_POSITION));
                 @SuppressLint("Range") String gender = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_GENDER));
+                @SuppressLint("Range") String status = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_STATUS));
                 @SuppressLint("Range") String hireDate = cursor.getString(cursor.getColumnIndex(Constants.COLUMN_HIRE_DATE));
                 @SuppressLint("Range") double salary = cursor.getDouble(cursor.getColumnIndex(Constants.COLUMN_SALARY));
 
@@ -148,6 +155,7 @@ public class EmployeeDetails extends AppCompatActivity {
                 spinnerDepartment.setEnabled(false);
                 spinnerPosition.setEnabled(false);
                 spinnerGender.setEnabled(false);
+                spinnerStatus.setEnabled(false);
 
                 // Set department spinner
                 for (int i = 0; i < departments.size(); i++) {
@@ -172,6 +180,16 @@ public class EmployeeDetails extends AppCompatActivity {
                     for (int i = 0; i < adapter.getCount(); i++) {
                         if (adapter.getItem(i).toString().equals(gender)) {
                             spinnerGender.setSelection(i);
+                            break;
+                        }
+                    }
+                }
+
+                if (status != null) {
+                    ArrayAdapter<CharSequence> adapter = (ArrayAdapter<CharSequence>) spinnerStatus.getAdapter();
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        if (adapter.getItem(i).toString().equals(status)) {
+                            spinnerStatus.setSelection(i);
                             break;
                         }
                     }
@@ -296,6 +314,7 @@ public class EmployeeDetails extends AppCompatActivity {
             spinnerDepartment.setEnabled(true);
             spinnerPosition.setEnabled(spinnerPosition.getAdapter().getCount() > 0);
             spinnerGender.setEnabled(true);
+            spinnerStatus.setEnabled(true);
         } else {
             setEditTextReadonly(editTextFirstName);
             setEditTextReadonly(editTextLastName);
@@ -307,6 +326,7 @@ public class EmployeeDetails extends AppCompatActivity {
             spinnerDepartment.setEnabled(false);
             spinnerPosition.setEnabled(false);
             spinnerGender.setEnabled(false);
+            spinnerStatus.setEnabled(false);
         }
     }
 
@@ -434,13 +454,14 @@ public class EmployeeDetails extends AppCompatActivity {
             String residence = editTextResidence.getText().toString();
             String position = spinnerPosition.getSelectedItem() != null ? spinnerPosition.getSelectedItem().toString() : "";
             String gender = spinnerGender.getSelectedItem() != null ? spinnerGender.getSelectedItem().toString() : "";
+            String status = spinnerStatus.getSelectedItem() != null ? spinnerStatus.getSelectedItem().toString() : "";
             String hireDate = editTextHireDate.getText().toString();
             String salaryStr = editTextSalary.getText().toString();
 
             if (TextUtils.isEmpty(firstName) || TextUtils.isEmpty(lastName) ||
                     TextUtils.isEmpty(phoneNumber) || TextUtils.isEmpty(email) ||
                     TextUtils.isEmpty(residence) || selectedDepartmentId == -1 ||
-                    TextUtils.isEmpty(position) || TextUtils.isEmpty(gender) ||
+                    TextUtils.isEmpty(position) || TextUtils.isEmpty(gender) || TextUtils.isEmpty(status) ||
                     TextUtils.isEmpty(hireDate) || TextUtils.isEmpty(salaryStr)) {
                 Toast.makeText(this, R.string.fill_all_fields, Toast.LENGTH_SHORT).show();
                 return;
@@ -472,7 +493,7 @@ public class EmployeeDetails extends AppCompatActivity {
             }
 
             Employee employee = new Employee(firstName, lastName, phoneNumber, email,
-                    selectedDepartmentId, position, residence, gender, hireDate, salary);
+                    selectedDepartmentId, position, residence, gender, status, hireDate, salary);
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.execute(() -> {
                 int rowsAffected = employeeDAO.updateEmployee(employeeId, employee, imageBytes);

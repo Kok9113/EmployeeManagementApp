@@ -10,6 +10,7 @@ public class Employee {
     private String position; // Thêm position
     private String residence;
     private String gender; // Thêm trường giới tính
+    private String status;
     private String hireDate; // Thêm trường ngày vào làm
     private double salary; // Thêm trường mức lương
     private byte[] image;
@@ -18,7 +19,7 @@ public class Employee {
     }
 
     public Employee(String firstName, String lastName, String phoneNumber, String email,
-                    long departmentId, String position, String residence, String gender,
+                    long departmentId, String position, String residence, String gender, String status,
                     String hireDate, double salary) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -28,6 +29,7 @@ public class Employee {
         this.position = position;
         this.residence = residence;
         this.gender = gender;
+        this.status = status;
         this.hireDate = hireDate;
         this.salary = salary;
     }
@@ -98,6 +100,10 @@ public class Employee {
 
     public String getGender() {
         return gender;
+    }
+
+    public String getStatus() {
+        return status;
     }
 
     public void setGender(String gender) {

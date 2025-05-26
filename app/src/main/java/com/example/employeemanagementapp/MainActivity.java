@@ -478,6 +478,38 @@ public class MainActivity extends AppCompatActivity {
                                     });
                                 }).start();
                             }
+
+                            // Xử lý thanh trạng thái
+                            View statusBar = view.findViewById(R.id.status_bar);
+                            int statusIndex = cursor.getColumnIndex(Constants.COLUMN_STATUS);
+                            if (statusIndex != -1) {
+                                String status = cursor.getString(statusIndex);
+                                int color;
+
+                                if (status == null) {
+                                    status = "Đang làm việc";
+                                }
+
+                                switch (status) {
+                                    case "Đang làm việc":
+                                    case "Currently Working":
+                                        color = ContextCompat.getColor(context, R.color.status_active);
+                                        break;
+                                    case "Resigned":
+                                    case "Đã Nghỉ":
+                                        color = ContextCompat.getColor(context, R.color.status_inactive);
+                                        break;
+                                    case "On Maternity Leave":
+                                    case "Đang nghỉ thai sản":
+                                        color = ContextCompat.getColor(context, R.color.status_maternity);
+                                        break;
+                                    default:
+                                        color = ContextCompat.getColor(context, R.color.status_active);
+                                        break;
+                                }
+
+                                statusBar.setBackgroundColor(color);
+                            }
                         }
                     };
 
