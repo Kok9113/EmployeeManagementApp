@@ -35,8 +35,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.PreferenceManager;
 import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 
 import com.example.employeemanagementapp.adapter.employee.EmployeeGridAdapter;
 import com.example.employeemanagementapp.db.DatabaseHelper;
@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
     private SimpleCursorAdapter listAdapter;
     private EmployeeGridAdapter gridAdapter;
     private EditText searchInput;
-    private ImageView settings;
     private ListView listView;
     private GridLayout gridLayout;
     private TextView noEmployeesText;
@@ -80,13 +79,11 @@ public class MainActivity extends AppCompatActivity {
     private View overlay;
     private ImageView imageMenu;
     private ImageView imageSortDepartment;
-    private Button filterDepartmentButton;
+    private Button btnAddEmployee;
+    private LinearLayout llUser, llDepartment, llRole, llPermission;
     private boolean isMenuOpen = false;
     private long selectedDeptId = -1; // -1 means all departments
 
-    private LinearLayout llUser, llDepartment, llRole, llPermission;
-
-    private Button btnAddEmployee;
     private BroadcastReceiver languageChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -95,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
                 prefs.edit().putString("selected_language", newLanguage).apply();
                 applyLanguage();
-                recreate(); // Tái tạo MainActivity để áp dụng ngôn ngữ mới
+                updateUIText(); // Cập nhật văn bản giao diện ngay lập tức
             }
         }
     };
@@ -103,17 +100,15 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        applyLanguage();
+        applyLanguage(); // Áp dụng ngôn ngữ trước khi setContentView
         setContentView(R.layout.activity_main);
 
+        // Khởi tạo DAO
         userDAO = new UserDAO(this);
-        // Đăng ký BroadcastReceiver với ContextCompat
-        IntentFilter filter = new IntentFilter("LANGUAGE_CHANGED");
-        ContextCompat.registerReceiver(this, languageChangeReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
-
         departmentDAO = new DepartmentDAO(this);
         departmentMap = new HashMap<>();
 
+        // Khởi tạo các view
         searchInput = findViewById(R.id.search_input);
         listView = findViewById(R.id.listview);
         gridLayout = findViewById(R.id.gridlayout);
@@ -123,14 +118,17 @@ public class MainActivity extends AppCompatActivity {
         imageMenu = findViewById(R.id.image_menu);
         imageSortDepartment = findViewById(R.id.image_sort_department);
         overlay = findViewById(R.id.overlay);
-
         llUser = findViewById(R.id.btn_user);
         llDepartment = findViewById(R.id.menu_departments);
         llRole = findViewById(R.id.btn_role);
         llPermission = findViewById(R.id.menu_permission);
-
         btnAddEmployee = findViewById(R.id.button_add_employee);
 
+        // Đăng ký BroadcastReceiver
+        IntentFilter filter = new IntentFilter("LANGUAGE_CHANGED");
+        ContextCompat.registerReceiver(this, languageChangeReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED);
+
+        // Kiểm tra view có tồn tại
         if (listView == null || gridLayout == null) {
             Log.e("MainActivity", "ListView or GridLayout not found in layout");
             Toast.makeText(this, R.string.error, Toast.LENGTH_LONG).show();
@@ -138,40 +136,36 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // Kiểm tra quyền người dùng
         SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
         int userId = sharedPreferences.getInt("authUserId", -1);
         if (userId != -1) {
             if (!userDAO.userHasPermission(userId, Constants.VIEW_USER)) {
                 llUser.setVisibility(View.GONE);
             }
-
             if (!userDAO.userHasPermission(userId, Constants.VIEW_DEPARTMENT)) {
                 llDepartment.setVisibility(View.GONE);
             }
-
             if (!userDAO.userHasPermission(userId, Constants.VIEW_ROLE)) {
                 llRole.setVisibility(View.GONE);
             }
-
             if (!userDAO.userHasPermission(userId, Constants.VIEW_PERMISSION)) {
                 llPermission.setVisibility(View.GONE);
             }
-
             if (!userDAO.userHasPermission(userId, Constants.VIEW_EMPLOYEE)) {
                 searchInput.setVisibility(View.GONE);
                 imageSortDepartment.setVisibility(View.GONE);
             }
-
             if (!userDAO.userHasPermission(userId, Constants.ADD_EMPLOYEE)) {
                 btnAddEmployee.setVisibility(View.GONE);
             }
-
             if (userDAO.userHasPermission(userId, Constants.VIEW_EMPLOYEE)) {
                 displayEmployees();
                 loadDepartments();
             }
         }
 
+        // Thiết lập TextWatcher cho ô tìm kiếm
         searchInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -184,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
+        // Thiết lập sự kiện click
         imageMenu.setOnClickListener(v -> {
             if (isMenuOpen) {
                 closeMenu();
@@ -196,23 +191,19 @@ public class MainActivity extends AppCompatActivity {
 
         overlay.setOnClickListener(v -> closeMenu());
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                @SuppressLint("Range") long employeeId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_ID));
-                showEmployeeDetails(employeeId);
-            }
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+            @SuppressLint("Range") long employeeId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_ID));
+            showEmployeeDetails(employeeId);
         });
 
-        btnAddEmployee.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
-                startActivityForResult(intent, ADD_EMPLOYEE_REQUEST_CODE);
-            }
+        btnAddEmployee.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, AddEmployeeActivity.class);
+            startActivityForResult(intent, ADD_EMPLOYEE_REQUEST_CODE);
         });
 
+        // Cập nhật văn bản giao diện ban đầu
+        updateUIText();
     }
 
     @Override
@@ -226,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         applyLanguage();
-        updateHeaderTitle();
+        updateUIText();
     }
 
     @Override
@@ -235,13 +226,11 @@ public class MainActivity extends AppCompatActivity {
         applyLanguage();
         SharedPreferences sharedPreferences = getSharedPreferences("UserSession", MODE_PRIVATE);
         int userId = sharedPreferences.getInt("authUserId", -1);
-        if (userId != -1) {
-            if (userDAO.userHasPermission(userId, Constants.VIEW_EMPLOYEE)) {
-                departmentMap.clear();
-                loadDepartments();
-                displayEmployees();
-                updateHeaderTitle();
-            }
+        if (userId != -1 && userDAO.userHasPermission(userId, Constants.VIEW_EMPLOYEE)) {
+            departmentMap.clear();
+            loadDepartments();
+            displayEmployees();
+            updateUIText();
         }
     }
 
@@ -286,12 +275,7 @@ public class MainActivity extends AppCompatActivity {
             itemView.setLayoutParams(params);
 
             final long employeeId = cursor.getLong(cursor.getColumnIndex(Constants.COLUMN_ID));
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showEmployeeDetails(employeeId);
-                }
-            });
+            itemView.setOnClickListener(v -> showEmployeeDetails(employeeId));
 
             gridLayout.addView(itemView);
             cursor.moveToNext();
@@ -312,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> departmentNames = new ArrayList<>();
         ArrayList<Long> departmentIds = new ArrayList<>();
 
-        // Add "All Departments" option
+        // Thêm tùy chọn "All Departments"
         departmentNames.add(getString(R.string.all_departments));
         departmentIds.add(-1L);
 
@@ -331,7 +315,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        // Custom ArrayAdapter for department list
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.department_list_item, R.id.department_name, departmentNames) {
             @NonNull
             @Override
@@ -340,7 +323,6 @@ public class MainActivity extends AppCompatActivity {
                 TextView textView = view.findViewById(R.id.department_name);
                 ImageView checkIcon = view.findViewById(R.id.check_icon);
 
-                // Highlight selected department
                 long deptId = departmentIds.get(position);
                 if (deptId == selectedDeptId) {
                     view.setBackgroundColor(getResources().getColor(R.color.selected_item_background));
@@ -351,7 +333,6 @@ public class MainActivity extends AppCompatActivity {
                     textView.setTextColor(getResources().getColor(android.R.color.black));
                     checkIcon.setVisibility(View.GONE);
                 }
-
                 return view;
             }
         };
@@ -363,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
                     selectedDeptId = deptId;
                     filterEmployeesByDepartment(deptId);
                     updateHeaderTitle();
-                    searchInput.setText(""); // Clear search input
+                    searchInput.setText(""); // Xóa ô tìm kiếm
                 })
                 .setNegativeButton(R.string.cancel, (dialog, which) -> dialog.dismiss())
                 .show();
@@ -382,23 +363,17 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("MainActivity", "Cursor is null in filterEmployeesByDepartment for deptId: " + deptId);
                 listView.setAdapter(null);
                 gridLayout.removeAllViews();
-                if (noEmployeesText != null) {
-                    noEmployeesText.setVisibility(View.VISIBLE);
-                }
+                noEmployeesText.setVisibility(View.VISIBLE);
                 return;
             }
             listAdapter.changeCursor(cursor);
             updateGridLayout(gridLayout, cursor);
-            if (noEmployeesText != null) {
-                noEmployeesText.setVisibility(cursor.moveToFirst() ? View.GONE : View.VISIBLE);
-            }
+            noEmployeesText.setVisibility(cursor.moveToFirst() ? View.GONE : View.VISIBLE);
         } catch (Exception e) {
             Log.e("MainActivity", "Error filtering employees by department: " + e.getMessage());
             listView.setAdapter(null);
             gridLayout.removeAllViews();
-            if (noEmployeesText != null) {
-                noEmployeesText.setVisibility(View.VISIBLE);
-            }
+            noEmployeesText.setVisibility(View.VISIBLE);
         }
     }
 
@@ -457,17 +432,15 @@ public class MainActivity extends AppCompatActivity {
                             super.bindView(view, context, cursor);
 
                             ImageView imageView = view.findViewById(R.id.image_profile);
-                            int idIndex = cursor.getColumnIndex(Constants.COLUMN_ID); // Giả sử cột ID là COLUMN_ID
+                            int idIndex = cursor.getColumnIndex(Constants.COLUMN_ID);
                             if (idIndex != -1) {
                                 long employeeId = cursor.getLong(idIndex);
-                                // Tải ảnh bất đồng bộ trên luồng nền
                                 new Thread(() -> {
-                                    byte[] imageBytes = employeeDAO.getEmployeeProfileImage(employeeId); // Hàm lấy dữ liệu ảnh
+                                    byte[] imageBytes = employeeDAO.getEmployeeProfileImage(employeeId);
                                     Bitmap bitmap = null;
                                     if (imageBytes != null && imageBytes.length > 0) {
                                         bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
                                     }
-                                    // Cập nhật UI trên luồng chính
                                     Bitmap finalBitmap = bitmap;
                                     new Handler(Looper.getMainLooper()).post(() -> {
                                         if (finalBitmap != null) {
@@ -479,7 +452,6 @@ public class MainActivity extends AppCompatActivity {
                                 }).start();
                             }
 
-                            // Xử lý thanh trạng thái
                             View statusBar = view.findViewById(R.id.status_bar);
                             int statusIndex = cursor.getColumnIndex(Constants.COLUMN_STATUS);
                             if (statusIndex != -1) {
@@ -507,22 +479,17 @@ public class MainActivity extends AppCompatActivity {
                                         color = ContextCompat.getColor(context, R.color.status_active);
                                         break;
                                 }
-
                                 statusBar.setBackgroundColor(color);
                             }
                         }
                     };
-
-
                     listView.setAdapter(listAdapter);
                 } else {
                     listAdapter.changeCursor(cursor);
                 }
                 listView.setVisibility(View.VISIBLE);
                 gridLayout.setVisibility(View.GONE);
-                if (noEmployeesText != null) {
-                    noEmployeesText.setVisibility(View.GONE);
-                }
+                noEmployeesText.setVisibility(View.GONE);
 
                 if (gridAdapter == null) {
                     gridAdapter = new EmployeeGridAdapter(this, cursor, departmentMap);
@@ -537,23 +504,16 @@ public class MainActivity extends AppCompatActivity {
                 gridLayout.setVisibility(View.GONE);
                 listView.setAdapter(null);
                 gridLayout.removeAllViews();
-                if (noEmployeesText != null) {
-                    noEmployeesText.setVisibility(View.VISIBLE);
-                } else {
-                    Toast.makeText(this, R.string.no_employees_found, Toast.LENGTH_SHORT).show();
-                }
+                noEmployeesText.setVisibility(View.VISIBLE);
             }
         } catch (Exception e) {
             Log.e("Employee Details", "Error accessing database: " + e.getMessage());
             Toast.makeText(this, R.string.not_found + e.getMessage(), Toast.LENGTH_LONG).show();
             listView.setVisibility(View.GONE);
             gridLayout.setVisibility(View.GONE);
-            if (noEmployeesText != null) {
-                noEmployeesText.setVisibility(View.VISIBLE);
-            }
+            noEmployeesText.setVisibility(View.VISIBLE);
         }
     }
-
 
     private void filterEmployeeList(String query) {
         Cursor cursor = null;
@@ -568,23 +528,17 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("MainActivity", "Cursor is null in filterEmployeeList for query: " + query);
                 listView.setAdapter(null);
                 gridLayout.removeAllViews();
-                if (noEmployeesText != null) {
-                    noEmployeesText.setVisibility(View.VISIBLE);
-                }
+                noEmployeesText.setVisibility(View.VISIBLE);
                 return;
             }
             listAdapter.changeCursor(cursor);
             updateGridLayout(gridLayout, cursor);
-            if (noEmployeesText != null) {
-                noEmployeesText.setVisibility(cursor.moveToFirst() ? View.GONE : View.VISIBLE);
-            }
+            noEmployeesText.setVisibility(cursor.moveToFirst() ? View.GONE : View.VISIBLE);
         } catch (Exception e) {
             Log.e("MainActivity", "Error filtering employees: " + e.getMessage());
             listView.setAdapter(null);
             gridLayout.removeAllViews();
-            if (noEmployeesText != null) {
-                noEmployeesText.setVisibility(View.VISIBLE);
-            }
+            noEmployeesText.setVisibility(View.VISIBLE);
         }
     }
 
@@ -600,55 +554,48 @@ public class MainActivity extends AppCompatActivity {
         closeMenu();
     }
 
-    // MENU
     private void refreshMenu() {
-        if (menuPanel != null) {
-            // Tìm LinearLayout chứa TextView
-            LinearLayout departmentsLayout = menuPanel.findViewById(R.id.menu_departments);
-            LinearLayout settingsLayout = menuPanel.findViewById(R.id.menu_settings);
-            LinearLayout userLayout = menuPanel.findViewById(R.id.btn_user);
-            LinearLayout roleLayout = menuPanel.findViewById(R.id.btn_role);
-            LinearLayout logoutLayout = menuPanel.findViewById(R.id.menu_logout);
-            LinearLayout permissionLayout = menuPanel.findViewById(R.id.menu_permission);
+        LinearLayout departmentsLayout = menuPanel.findViewById(R.id.menu_departments);
+        LinearLayout settingsLayout = menuPanel.findViewById(R.id.menu_settings);
+        LinearLayout userLayout = menuPanel.findViewById(R.id.btn_user);
+        LinearLayout roleLayout = menuPanel.findViewById(R.id.btn_role);
+        LinearLayout logoutLayout = menuPanel.findViewById(R.id.menu_logout);
+        LinearLayout permissionLayout = menuPanel.findViewById(R.id.menu_permission);
 
-
-            // Tìm TextView bên trong LinearLayout
-            if (departmentsLayout != null) {
-                TextView departmentsText = departmentsLayout.findViewById(R.id.text_department);
-                if (departmentsText != null) {
-                    departmentsText.setText(getString(R.string.menu_departments));
-                }
+        if (departmentsLayout != null) {
+            TextView departmentsText = departmentsLayout.findViewById(R.id.text_department);
+            if (departmentsText != null) {
+                departmentsText.setText(getString(R.string.menu_departments));
             }
-            if (settingsLayout != null) {
-                TextView settingsText = settingsLayout.findViewById(R.id.text_settings);
-                if (settingsText != null) {
-                    settingsText.setText(getString(R.string.menu_settings));
-                }
+        }
+        if (settingsLayout != null) {
+            TextView settingsText = settingsLayout.findViewById(R.id.text_settings);
+            if (settingsText != null) {
+                settingsText.setText(getString(R.string.menu_settings));
             }
-            if (userLayout != null) {
-                TextView usersText = userLayout.findViewById(R.id.text_username);
-                if (usersText != null) {
-                    usersText.setText(getString(R.string.menu_user));
-                }
+        }
+        if (userLayout != null) {
+            TextView usersText = userLayout.findViewById(R.id.text_username);
+            if (usersText != null) {
+                usersText.setText(getString(R.string.menu_user));
             }
-
-            if (roleLayout != null) {
-                TextView roleText = roleLayout.findViewById(R.id.text_role);
-                if (roleText != null) {
-                    roleText.setText(getString(R.string.menu_role));
-                }
+        }
+        if (roleLayout != null) {
+            TextView roleText = roleLayout.findViewById(R.id.text_role);
+            if (roleText != null) {
+                roleText.setText(getString(R.string.menu_role));
             }
-            if (logoutLayout != null) {
-                TextView logoutText = logoutLayout.findViewById(R.id.text_logout);
-                if (logoutText != null) {
-                    logoutText.setText(getString(R.string.menu_logout));
-                }
+        }
+        if (logoutLayout != null) {
+            TextView logoutText = logoutLayout.findViewById(R.id.text_logout);
+            if (logoutText != null) {
+                logoutText.setText(getString(R.string.menu_logout));
             }
-            if (permissionLayout != null) {
-                TextView permissionText = permissionLayout.findViewById(R.id.text_permission);
-                if (permissionText != null) {
-                    permissionText.setText(getString(R.string.menu_permission));
-                }
+        }
+        if (permissionLayout != null) {
+            TextView permissionText = permissionLayout.findViewById(R.id.text_permission);
+            if (permissionText != null) {
+                permissionText.setText(getString(R.string.menu_permission));
             }
         }
     }
@@ -660,7 +607,7 @@ public class MainActivity extends AppCompatActivity {
         menuPanel.setTranslationX(-menuPanel.getWidth());
         menuPanel.animate().translationX(0).setDuration(300).start();
         isMenuOpen = true;
-        refreshMenu(); // Làm mới menu khi mở
+        refreshMenu();
     }
 
     private void closeMenu() {
@@ -695,33 +642,28 @@ public class MainActivity extends AppCompatActivity {
 
     public void GoToLogout(View view) {
         new AlertDialog.Builder(this)
-            .setTitle(getString(R.string.logout_confirm_title))
-            .setMessage(getString(R.string.logout_confirm_message))
-            .setPositiveButton(getString(R.string.logout_confirm_yes), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
+                .setTitle(getString(R.string.logout_confirm_title))
+                .setMessage(getString(R.string.logout_confirm_message))
+                .setPositiveButton(getString(R.string.logout_confirm_yes), (dialog, which) -> {
                     SharedPreferences preferences = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.clear();
                     editor.apply();
-
                     Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
-                }
-            })
-            .setNegativeButton(getString(R.string.logout_confirm_no), null)
-            .show();
+                })
+                .setNegativeButton(getString(R.string.logout_confirm_no), null)
+                .show();
     }
 
-    // Language
     private void applyLanguage() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         String selectedLanguage = preferences.getString("selected_language", "");
-        Log.d("selected language", selectedLanguage);
+        Log.d("MainActivity", "Applying language: " + selectedLanguage);
         Locale newLocale;
-        if (selectedLanguage != null && selectedLanguage.equals("Tiếng Việt")) {
+        if ("Tiếng Việt".equals(selectedLanguage)) {
             newLocale = new Locale("vi");
         } else {
             newLocale = Locale.ENGLISH;
@@ -729,8 +671,25 @@ public class MainActivity extends AppCompatActivity {
         Locale.setDefault(newLocale);
         Configuration config = new Configuration();
         config.setLocale(newLocale);
-        getBaseContext().getResources().updateConfiguration(config,
-                getBaseContext().getResources().getDisplayMetrics());
-        refreshMenu(); // Làm mới menu sau khi áp dụng ngôn ngữ
+        getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
+    }
+
+    private void updateUIText() {
+        // Cập nhật ô tìm kiếm
+        searchInput.setHint(getString(R.string.search_hint));
+
+        // Cập nhật tiêu đề
+        updateHeaderTitle();
+
+        // Cập nhật văn bản "no employees"
+        noEmployeesText.setText(getString(R.string.no_employees_found));
+
+        // Cập nhật menu
+        refreshMenu();
+
+        // Cập nhật dialog chọn phòng ban (nếu đang mở)
+        if (selectedDeptId != -1) {
+            showDepartmentListDialog();
+        }
     }
 }
